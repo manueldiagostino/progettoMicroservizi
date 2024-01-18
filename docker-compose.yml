@@ -1,0 +1,34 @@
+version: '3.1'
+
+services:
+  authors_dbms:
+    image: postgres
+    container_name: authors_dbms
+    hostname: authors_dbms
+    restart: always
+    ports:
+      - 10000:5432
+    env_file: 
+      - ./AuthorsHandler/AuthorsHandler.Repository/Database/.env
+    volumes:
+      - ./AuthorsHandler/AuthorsHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
+      # - ./data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    hostname: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  authors_microservice:
+    depends_on:
+      - authors_dbms
+      - adminer
+    image: authors_microservice
+    build:
+      context: .
+      dockerfile: AuthorsHandler/AuthorsHandler.Api/Dockerfile
+    ports:
+      - 5000:5082
