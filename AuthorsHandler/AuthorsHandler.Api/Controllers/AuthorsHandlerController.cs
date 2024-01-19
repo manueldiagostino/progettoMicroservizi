@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AuthorsHandler.Business.Abstraction;
 using AuthorsHandler.Shared;
+using AuthorsHandler.Repository.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthorsHandler.Controllers
@@ -28,6 +25,30 @@ namespace AuthorsHandler.Controllers
                 return Ok("Author " + authorDto.name + " " + authorDto.surname + " added");
             else
                 return BadRequest("The author already exists");
+        }
+
+        [HttpDelete(Name = "RemoveAuthor")]
+        public async Task<IActionResult> DeleteAuthor(AuthorDto authorDto) {
+            
+            Author? deletedAuthor = await business_.RemoveAuthor(authorDto);
+
+            if (deletedAuthor != null)
+                return Ok("Author " + deletedAuthor.name + " " + deletedAuthor.surname + " deleted");
+            else
+                return BadRequest("The author does not exist");
+        }
+
+        [HttpPost(Name = "UpdateAuthor")]
+        public async Task<IActionResult> UpdateAuthor([FromQuery]UpdateAuthorDto update) { // cerca Query
+            AuthorDto oldAuthor = new AuthorDto { name = update.oldName, surname = update.oldSurname};
+            AuthorDto newAuthor = new AuthorDto { name = update.newName, surname = update.newSurname};
+
+            var res = await business_.UpdateAuthor(oldAuthor, newAuthor);
+
+            if (res == 1)
+                return Ok("Author updated");
+            else
+                return BadRequest("The author does not exist");
         }
 
         [HttpGet(Name = "GetAuthorIdFromName")]
