@@ -40,6 +40,15 @@ INSERT INTO "external_link" ("id", "authorId", "url") VALUES
 (3,	2,	'https://it.wikipedia.org/wiki/Ludwig_van_Beethoven'),
 (4,	1,	'https://it.wikipedia.org/wiki/Fryderyk_Chopin');
 
+DROP TABLE IF EXISTS "transactional_outbox";
+CREATE TABLE "public"."transactional_outbox" (
+    "id" integer NOT NULL,
+    "table" character varying NOT NULL,
+    "message" character varying NOT NULL
+) WITH (oids = false);
+
+TRUNCATE "transactional_outbox";
+
 ALTER TABLE ONLY "public"."external_link" ADD CONSTRAINT "external_links_author_id_fkey" FOREIGN KEY ("authorId") REFERENCES author(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-01-18 15:20:10.377243+00
+-- 2024-01-20 07:08:32.539157+00
