@@ -23,7 +23,7 @@ namespace GlobalUtility.Kafka.Services {
 		protected Task ExecutingTask { get; private set; } = Task.CompletedTask;
 
 		protected Timer? TimerTask { get; private set; }
-
+		
 		bool _disposedValue;
 
 		public ProducerService(
@@ -47,25 +47,27 @@ namespace GlobalUtility.Kafka.Services {
 		}
 		public override async Task StartAsync(CancellationToken cancellationToken) {
 			foreach (var topic in Topics) {
-				while (!await AdministratorClient.TopicExists(topic));
+				while (!AdministratorClient.TopicExists(topic)) {
+					await Task.Delay(100, cancellationToken);
+				};
 			}
 
 			TimerTask = new Timer(DoWork, null, TimeSpan.FromSeconds(DueTime), TimeSpan.FromMilliseconds(Timeout.Infinite));
 		}
-		private void DoWork(object? state) {
+		protected void DoWork(object? state) {
 			// Blocco il TimerTask per impedire che il metodo ExecuteTask venga invocato nuovamente prima che sia terminata
 			// l'esecuzione del metodo ExecuteTaskAsync
 			StopTimer();
-			ExecutingTask = DoWorkAsync(StoppingCts.Token);
+			ExecutingTask = ExecuteTaskAsync(StoppingCts.Token);
 		}
-		private async Task DoWorkAsync(CancellationToken cancellationToken) {
+		private async Task ExecuteTaskAsync(CancellationToken cancellationToken) {
 			Logger.LogInformation("START ProducerService.ExecuteTaskAsync...");
 
 			try {
 				await OperationsAsync(cancellationToken);
 			} catch (Exception ex) {
 				Logger.LogError(ex, "Exception sollevata all'interno del metodo {methodName}. Exception Message: {message}",
-					nameof(DoWorkAsync), ex.Message);
+					nameof(ExecuteTaskAsync), ex.Message);
 			}
 
 			Logger.LogInformation("STOP ProducerService.ExecuteTaskAsync");
@@ -99,6 +101,27 @@ namespace GlobalUtility.Kafka.Services {
 			}
 
 			Logger.LogInformation("STOP ProducerService");
+		}
+
+		protected virtual void Dispose(bool disposing) {
+			if (!_disposedValue) {
+				if (disposing) {
+					// Eliminare lo stato gestito (oggetti gestiti)
+					ProducerClient?.Dispose();
+					AdministratorClient?.Dispose();
+					base.Dispose();
+				}
+
+				// Liberare risorse non gestite (oggetti non gestiti) ed eseguire l'override del finalizzatore
+				// Impostare campi di grandi dimensioni su Null
+				_disposedValue = true;
+			}
+		}
+		
+		public override void Dispose() {
+			// Non modificare questo codice. Inserire il codice di pulizia nel metodo 'Dispose(bool disposing)'
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
 		}
 	}
 }

@@ -6,34 +6,33 @@ using System.Threading.Tasks;
 namespace GlobalUtility.Kafka.Config {
 
 	public abstract class KafkaConfigs {
-		public string SectionName = "Kafka";
-		public string BootstrapServers = string.Empty;
+		public static string SectionName { get; set; } = "Kafka";
+		public string BootstrapServers { get; set; } = string.Empty;
 	}
 
 	// concrete implementations
 	public class KafkaAdminClientOptions : KafkaConfigs {
-		public KafkaAdminClientOptions() {
-			this.SectionName = "Kafka:AdminClient";
-		}
+		public new static string SectionName { get; set; } = "Kafka:AdminClient";
 	}
 
 	public class KafkaProducerClientOptions : KafkaConfigs {
-		public KafkaProducerClientOptions() {
-			this.SectionName = "Kafka:ProducerClient";
-		}
+		public new static string SectionName { get; set; } = "Kafka:ProducerClient";
+		public int DelaySeconds { get; set; } = 60;
+
+		public int IntervalSeconds { get; set; } = 60;
 	}
 
 	public class KafkaConsumerClientOptions : KafkaConfigs {
-		public string GroupId;
+		public new static string SectionName { get; set; } = "Kafka:ConsumerClient";
+		public string GroupId { get; set; } = string.Empty;
 		public KafkaConsumerClientOptions() {
-			this.SectionName = "Kafka:ConsumerClient";
-			this.GroupId = string.Empty;
+			GroupId = string.Empty;
 		}
 	}
 
 	// another config for a ProducerService
 	public class KafkaProducerServiceOptions {
-		public string SectionName = "Kafka:ProducerService";
+		public static string SectionName = "Kafka:ProducerService";
 		public int DelaySeconds { get; set; } = 60;
 		public int IntervalSeconds { get; set; } = 60;
 	}
@@ -43,7 +42,7 @@ namespace GlobalUtility.Kafka.Config {
 	}
 
 	public abstract class AbstractKafkaTopics : IKafkaTopics {
-		public string SectionName = "Kafka:Topics";
+		public static string SectionName { get; set; } = "Kafka:Topics";
 
 		public abstract IEnumerable<string> GetTopics();
 	}

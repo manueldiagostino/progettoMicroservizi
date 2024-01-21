@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace GlobalUtility.Kafka.Abstraction.Messages {
 	public interface IOperation<TDto> where TDto : class, new() {
-		public string Name { init; get; }
+		public string Name { get; }
 
 		/* 
 			The concrete implementation of an IOperation<TDto> defines
@@ -13,6 +8,13 @@ namespace GlobalUtility.Kafka.Abstraction.Messages {
 			IOperation will have a reference to a Repository and it can
 			perform the insertion of the dto correctly.
 		*/
-		public void Execute(TDto dto); 
+		public Task Execute(TDto dto, CancellationToken cancellationToken = default);
+	}
+	public class DefaultOperation<TDto> : IOperation<TDto> where TDto : class, new() {
+		public string Name { get => "Default"; }
+
+		public Task Execute(TDto dto, CancellationToken cancellationToken = default) {
+			return Task.CompletedTask;
+		}
 	}
 }

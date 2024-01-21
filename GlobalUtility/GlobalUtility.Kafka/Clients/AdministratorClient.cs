@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using GlobalUtility.Kafka.Abstraction.Clients;
@@ -119,7 +115,7 @@ namespace GlobalUtility.Kafka.Clients {
 		}
 
 		public bool TopicExists(string topic) {
-			return GetMetadata(topic).Topics.Any();
+			return GetMetadata(topic).Topics.Count != 0;
 		}
 
 		public void Dispose() {
