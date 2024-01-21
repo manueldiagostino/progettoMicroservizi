@@ -15,6 +15,7 @@ namespace AuthorsHandler.Repository {
 
 			modelBuilder.Entity<Author>().ToTable("author");
 			modelBuilder.Entity<ExternalLink>().ToTable("external_link");
+			modelBuilder.Entity<TransactionalOutbox>().ToTable("transactional_outbox");
 
 			modelBuilder.Entity<Author>().HasKey(x => x.id);
 			modelBuilder.Entity<ExternalLink>().HasKey(x => x.id);
@@ -22,11 +23,12 @@ namespace AuthorsHandler.Repository {
 			modelBuilder.Entity<Author>()
 				.HasMany(e => e.externalLinks)
 				.WithOne(e => e.author);
+
+			modelBuilder.Entity<TransactionalOutbox>().HasKey(x => x.id);
 		}
 
 		public DbSet<Author> Authors { get; set; }
 		public DbSet<ExternalLink> ExternalLinks { get; set; }
-
 		public DbSet<TransactionalOutbox> TransactionalOutboxes { get; set; }
 
 
