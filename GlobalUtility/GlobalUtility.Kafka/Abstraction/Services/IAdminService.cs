@@ -3,5 +3,5 @@ using Microsoft.Extensions.Hosting;
 
 namespace GlobalUtility.Kafka.Abstraction.Services;
 
-public abstract class IAdminService<TKafkaTopicsInput> : BackgroundService where TKafkaTopicsInput : class, IKafkaTopics {
+public abstract class IAdministratorClientService<TKafkaTopicsInput> : BackgroundService where TKafkaTopicsInput : class, IKafkaTopics {
 }
