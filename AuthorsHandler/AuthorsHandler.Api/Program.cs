@@ -1,10 +1,8 @@
 using AuthorsHandler.Business;
 using AuthorsHandler.Business.Abstraction;
-using AuthorsHandler.Controllers;
+using AuthorsHandler.Business.Kafka;
 using AuthorsHandler.Repository;
 using AuthorsHandler.Repository.Abstraction;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddLogging(logging => logging.AddConsole());
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AuthorsHandlerDbContext>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IBusiness, Business>();
+
+builder.Services.AddKafkaAdministratorService<KafkaTopicsOutput>(builder.Configuration);
+Console.WriteLine("executed AddKafkaAdministratorService");
+builder.Services.AddKafkaProducerService<KafkaTopicsOutput, ProducerService>(builder.Configuration);
+Console.WriteLine("executed AddKafkaProducerService");
+
+// object value = builder.Services.AddAutoMapper(typeof(AssemblyMarker));
 
 var app = builder.Build();
 

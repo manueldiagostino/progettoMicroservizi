@@ -17,7 +17,7 @@ namespace AuthorsHandler.Controllers
         }
 
         [HttpPut(Name = "CreateAuthor")]
-        public async Task<IActionResult> CreateAuthor(AuthorDto authorDto) {
+        public async Task<IActionResult> CreateAuthor([FromQuery]AuthorDto authorDto) {
             
             bool isCreated = await business_.CreateAuthor(authorDto);
 
@@ -28,7 +28,7 @@ namespace AuthorsHandler.Controllers
         }
 
         [HttpDelete(Name = "RemoveAuthor")]
-        public async Task<IActionResult> DeleteAuthor(AuthorDto authorDto) {
+        public async Task<IActionResult> DeleteAuthor([FromQuery]AuthorDto authorDto) {
             
             Author? deletedAuthor = await business_.RemoveAuthor(authorDto);
 
@@ -70,5 +70,39 @@ namespace AuthorsHandler.Controllers
 
             return Ok("Author " + name + " " + surname + " has urls:\n" + String.Join("\n", res));
         }
-    }
+    
+		[HttpPut(Name = "InsertExternalLink")]
+		public async Task<IActionResult> InsertExternalLink([FromQuery]AuthorDto authorDto, string url) {
+            
+           ExternalLink? res = await business_.InsertExternalLinkForAuthor(authorDto, url);
+
+            if (res != null)
+                return Ok($"Link {res.url} added to {authorDto.name} {authorDto.surname}");
+            else
+                return BadRequest("The author provided does not exists");
+        }
+
+		[HttpPost(Name = "UpdateExternalLink")]
+		public async Task<IActionResult> UpdateExternalLink([FromQuery]AuthorDto authorDto, string url) {
+            
+           int? res = await business_.UpdateExternalLinkForAuthor(authorDto, url);
+
+            if (res != null)
+                return Ok($"Link updated");
+            else
+                return BadRequest("The author provided does not exists");
+        }
+
+		[HttpDelete(Name = "RemoveExternalLink")]
+		public async Task<IActionResult> RemoveExternalLink([FromQuery]AuthorDto authorDto, string url) {
+            
+           ExternalLink? res = await business_.RemoveExternalLinkForAuthor(authorDto, url);
+
+            if (res != null)
+                return Ok($"Link {res.url} removed");
+            else
+                return BadRequest("The author provided does not exists");
+        }
+	
+	}
 }

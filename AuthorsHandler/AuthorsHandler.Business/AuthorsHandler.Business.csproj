@@ -9,6 +9,9 @@
   <ItemGroup>
     <ProjectReference Include="../AuthorsHandler.Shared/AuthorsHandler.Shared.csproj" />
     <ProjectReference Include="../AuthorsHandler.Repository/AuthorsHandler.Repository.csproj" />
+
+
+	<ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
   </ItemGroup>
 
 </Project>

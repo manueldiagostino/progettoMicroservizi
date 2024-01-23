@@ -6,13 +6,15 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="../AuthorsHandler.Shared/AuthorsHandler.Shared.csproj" />
     <ProjectReference Include="../AuthorsHandler.Business/AuthorsHandler.Business.csproj" />
     <ProjectReference Include="..\AuthorsHandler.Repository\AuthorsHandler.Repository.csproj" />
+    <ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
   </ItemGroup>
 </Project>
