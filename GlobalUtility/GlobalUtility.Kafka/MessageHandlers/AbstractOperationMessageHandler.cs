@@ -4,10 +4,10 @@ using GlobalUtility.Kafka.Abstraction.Messages;
 using GlobalUtility.Kafka.Messages;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using Utility.Kafka.Constants;
-using Utility.Kafka.Exceptions;
+using GlobalUtility.Kafka.Constants;
+using GlobalUtility.Kafka.Exceptions;
 
-namespace Utility.Kafka.MessageHandlers;
+namespace GlobalUtility.Kafka.MessageHandlers;
 
 /// <summary>
 /// Classe per gestire messaggi di tipo <see cref="OperationMessage{TMessageDto}"/>. <br/>

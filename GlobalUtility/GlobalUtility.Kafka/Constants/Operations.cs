@@ -1,4 +1,4 @@
-namespace Utility.Kafka.Constants;
+namespace GlobalUtility.Kafka.Constants;
 
 /// <summary>
 /// Dominio valori Operations

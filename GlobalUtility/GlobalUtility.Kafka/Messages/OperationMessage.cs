@@ -1,6 +1,6 @@
 using GlobalUtility.Kafka.Abstraction.Messages;
-using Utility.Kafka.Constants;
-using Utility.Kafka.Exceptions;
+using GlobalUtility.Kafka.Constants;
+using GlobalUtility.Kafka.Exceptions;
 
 namespace GlobalUtility.Kafka.Messages {
 	public class OperationMessage<TDto> : IOperationMessage<TDto> where TDto : class, new() {

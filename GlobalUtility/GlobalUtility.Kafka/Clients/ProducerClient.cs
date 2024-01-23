@@ -20,13 +20,13 @@ public class ProducerClient : IProducerClient {
 	private ILogger<IProducerClient> _logger;
 	private IProducer<Null, string> _producer;
 
-	public ProducerClient(IOptions<KafkaConfigs> options, ILogger<IProducerClient> logger) {
+	public ProducerClient(IOptions<KafkaProducerClientOptions> options, ILogger<IProducerClient> logger) {
 		_disposed = false;
 		_logger = logger;
 		_producer = new ProducerBuilder<Null, string>(GetProducerconfig(options)).Build();
 	}
 
-	private ProducerConfig GetProducerconfig(IOptions<KafkaConfigs> options) {
+	private ProducerConfig GetProducerconfig(IOptions<KafkaProducerClientOptions> options) {
 		ProducerConfig config = new() {
 			BootstrapServers = options.Value.BootstrapServers,
 			ClientId = Dns.GetHostName()

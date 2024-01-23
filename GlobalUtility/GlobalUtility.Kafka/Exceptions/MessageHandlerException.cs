@@ -1,4 +1,4 @@
-namespace Utility.Kafka.Exceptions;
+namespace GlobalUtility.Kafka.Exceptions;
 
 public class MessageHandlerException : ArgumentException {
 	public MessageHandlerException() : base() { }

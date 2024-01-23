@@ -1,4 +1,4 @@
-namespace Utility.Kafka.Exceptions;
+namespace GlobalUtility.Kafka.Exceptions;
 
 internal class MessageException : ArgumentException {
 	public MessageException() : base() { }

@@ -17,6 +17,9 @@ namespace GlobalUtility.Kafka.Clients {
 			_adminClient = new AdminClientBuilder(GetAdminClientConfig(options)).Build();
 			_logger = logger;
 			_disposed = false;
+
+			if (_logger == null)
+				throw new ArgumentException("_logger is null");
 		}
 
 		private AdminClientConfig GetAdminClientConfig(IOptions<KafkaAdminClientOptions> options) {
@@ -25,7 +28,8 @@ namespace GlobalUtility.Kafka.Clients {
 				ClientId = Dns.GetHostName()
 			};
 
-			_logger.LogInformation("Kafka AdminClientConfig: {adminClientConfig}", JsonSerializer.Serialize(config));
+			Console.WriteLine("config[BootstrapServers]: " + config.BootstrapServers);
+			Console.WriteLine("config[ClientId]: " + config.ClientId);
 			return config;
 		}
 
@@ -96,26 +100,40 @@ namespace GlobalUtility.Kafka.Clients {
 			await TryCatchAsync(() => _adminClient.DeleteTopicsAsync(topics, options), nameof(DeleteTopicsAsync));
 			_logger.LogInformation("Cancellazione dei topic '{topics}' completata!", string.Join("', '", topics));
 		}
-		public Metadata GetMetadata(string? topic = null) {
+		public Metadata? GetMetadata(string? topic = null) {
 
 			TimeSpan timeSpan = TimeSpan.FromSeconds(30);
 			string topicInfo = string.Empty;
 
-			Metadata meta;
-			if (string.IsNullOrWhiteSpace(topic)) {
-				meta = _adminClient.GetMetadata(timeSpan);
-			} else {
-				topicInfo = $" per il Topic '{topic}'";
-				meta = _adminClient.GetMetadata(topic, timeSpan);
-			}
+			Metadata? meta = null;
+			try {
+				if (string.IsNullOrWhiteSpace(topic)) {
+					meta = _adminClient.GetMetadata(timeSpan);
+				} else {
+					topicInfo = $" per il Topic '{topic}'";
+					meta = _adminClient.GetMetadata(topic, timeSpan);
+				}
 
-			_logger.LogInformation("Kafka Cluster Metadata{topicInfo}: {meta}", topicInfo, meta.ToString());
+				_logger.LogInformation("Kafka Cluster Metadata{topicInfo}: {meta}", topicInfo, meta.ToString());
+			} catch (KafkaException ex) {
+				Console.WriteLine($"Errore durante l'ottenimento dei metadati del cluster Kafka: {ex.Message}");
+				
+			}
 
 			return meta;
 		}
 
+		public Metadata? GetMetadata(TimeSpan timeSpan) {
+			try {
+				return _adminClient.GetMetadata(timeSpan);
+			} catch (KafkaException) {
+				return null;
+			}
+		}
+
 		public bool TopicExists(string topic) {
-			return GetMetadata(topic).Topics.Count != 0;
+			var res = GetMetadata(topic);
+			return res?.Topics.Count != 0;
 		}
 
 		public void Dispose() {

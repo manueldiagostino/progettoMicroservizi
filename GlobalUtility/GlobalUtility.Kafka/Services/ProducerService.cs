@@ -8,6 +8,7 @@ using GlobalUtility.Kafka.Abstraction.Services;
 using GlobalUtility.Kafka.Config;
 using GlobalUtility.Kafka.Abstraction.MessageHandler;
 using Confluent.Kafka;
+using Microsoft.VisualBasic;
 
 namespace GlobalUtility.Kafka.Services {
 	public abstract class ProducerService<TKafkaTopicsOutput> : IProducerService<TKafkaTopicsOutput> where TKafkaTopicsOutput : class, IKafkaTopics {
@@ -23,7 +24,7 @@ namespace GlobalUtility.Kafka.Services {
 		protected Task ExecutingTask { get; private set; } = Task.CompletedTask;
 
 		protected Timer? TimerTask { get; private set; }
-		
+
 		bool _disposedValue;
 
 		public ProducerService(
@@ -45,34 +46,45 @@ namespace GlobalUtility.Kafka.Services {
 			ServiceScopeFactory = serviceScopeFactory;
 			_disposedValue = false;
 		}
-		public override async Task StartAsync(CancellationToken cancellationToken) {
+
+		protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
+			Logger.LogInformation("START ProducerService: ExecuteAsync");
+
+			// check AdministratorService
 			foreach (var topic in Topics) {
 				while (!AdministratorClient.TopicExists(topic)) {
+					Logger.LogInformation("WAITING ProducerService: TopicExists");
 					await Task.Delay(100, cancellationToken);
 				};
 			}
 
 			TimerTask = new Timer(DoWork, null, TimeSpan.FromSeconds(DueTime), TimeSpan.FromMilliseconds(Timeout.Infinite));
+			Logger.LogInformation("ESC ProducerService: ExecuteAsync");
+			await Task.CompletedTask;
 		}
+
 		protected void DoWork(object? state) {
 			// Blocco il TimerTask per impedire che il metodo ExecuteTask venga invocato nuovamente prima che sia terminata
 			// l'esecuzione del metodo ExecuteTaskAsync
 			StopTimer();
 			ExecutingTask = ExecuteTaskAsync(StoppingCts.Token);
 		}
+
 		private async Task ExecuteTaskAsync(CancellationToken cancellationToken) {
 			Logger.LogInformation("START ProducerService.ExecuteTaskAsync...");
 
 			try {
 				await OperationsAsync(cancellationToken);
-			} catch (Exception ex) {
-				Logger.LogError(ex, "Exception sollevata all'interno del metodo {methodName}. Exception Message: {message}",
-					nameof(ExecuteTaskAsync), ex.Message);
+			} catch (Exception e) {
+				Logger.LogError(e, "Exception sollevata all'interno del metodo {methodName}. Exception Message: {message}",
+					nameof(ExecuteTaskAsync), e.Message);
+				throw e;
 			}
 
 			Logger.LogInformation("STOP ProducerService.ExecuteTaskAsync");
 
 			ActivateTimer();
+			await Task.CompletedTask;
 		}
 
 		private void ActivateTimer() {
@@ -100,7 +112,7 @@ namespace GlobalUtility.Kafka.Services {
 				}
 			}
 
-			Logger.LogInformation("STOP ProducerService");
+			Logger.LogInformation("ProducerService.StopAsync finished");
 		}
 
 		protected virtual void Dispose(bool disposing) {
@@ -117,7 +129,7 @@ namespace GlobalUtility.Kafka.Services {
 				_disposedValue = true;
 			}
 		}
-		
+
 		public override void Dispose() {
 			// Non modificare questo codice. Inserire il codice di pulizia nel metodo 'Dispose(bool disposing)'
 			Dispose(disposing: true);
