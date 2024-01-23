@@ -8,7 +8,7 @@
 				"build"
 			],
 			"dockerBuild": {
-				"tag": "nuovoprogettomicroservizi:dev",
+				"tag": "progettomicroservizi:dev",
 				"target": "base",
 				"dockerfile": "${workspaceFolder}/AuthorsHandler/AuthorsHandler.Api/Dockerfile",
 				"context": "${workspaceFolder}",
@@ -25,7 +25,7 @@
 				"build"
 			],
 			"dockerBuild": {
-				"tag": "nuovoprogettomicroservizi:latest",
+				"tag": "progettomicroservizi:latest",
 				"dockerfile": "${workspaceFolder}/AuthorsHandler/AuthorsHandler.Api/Dockerfile",
 				"context": "${workspaceFolder}",
 				"platform": {
@@ -60,6 +60,42 @@
 			"netCore": {
 				"appProject": "${workspaceFolder}/AuthorsHandler/AuthorsHandler.Api/AuthorsHandler.Api.csproj"
 			}
+		},
+		{
+			"label": "build",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/AuthorsHandler/AuthorsHandler.sln",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary;ForceNoAlign"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "publish",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"publish",
+				"${workspaceFolder}/AuthorsHandler/AuthorsHandler.sln",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary;ForceNoAlign"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "watch",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"watch",
+				"run",
+				"--project",
+				"${workspaceFolder}/AuthorsHandler/AuthorsHandler.sln"
+			],
+			"problemMatcher": "$msCompile"
 		}
 	]
 }
