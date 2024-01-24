@@ -50,7 +50,7 @@ public class Repository : IRepository {
 
 		if (userList.Count != 1)
 			throw new RepositoryException($"Found <{userList.Count}> users for userId <{userId}>");
-		
+
 		User user = userList[0];
 
 		string? filePath = user.PropicPath;
@@ -167,5 +167,102 @@ public class Repository : IRepository {
 		, cancellationToken);
 
 		return userList[0];
+	}
+
+	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+		var queryable = _dbContext.Users
+			.Where(x => x.Id == bioDto.UserId);
+
+		List<User> userList = await queryable.ToListAsync(cancellationToken: cancellationToken);
+		if (userList.Count != 1)
+			throw new RepositoryException($"Found <{userList.Count}> users for id <{bioDto.UserId}>");
+
+		User user = userList[0];
+		if (user.BioId != null)
+			throw new RepositoryException($"User <{user.Id}> has already bio <{user.BioId}>");
+
+		Bio bio = new() {
+			UserId = bioDto.UserId,
+			Text = bioDto.Text
+		};
+
+		await _dbContext.AddAsync(bio, cancellationToken);
+		await _dbContext.SaveChangesAsync(cancellationToken);
+
+		List<Bio> bioList = await _dbContext.Biographies
+			.Where(x => x.UserId == bioDto.UserId)
+			.ToListAsync(cancellationToken: cancellationToken);
+
+		if (bioList.Count != 1)
+			throw new RepositoryException($"Found <{bioList.Count}> users for id <{bioDto.UserId}>");
+
+		int bioId = bioList[0].Id;
+		await queryable.ExecuteUpdateAsync(x => x
+			.SetProperty(x => x.BioId, bioId)
+		, cancellationToken);
+
+		return user;
+	}
+
+	public async Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+		var queryable = _dbContext.Users
+			.Where(x => x.Id == bioDto.UserId);
+
+		List<User> userList = await queryable.ToListAsync(cancellationToken: cancellationToken);
+		if (userList.Count != 1)
+			throw new RepositoryException($"Found <{userList.Count}> users for id <{bioDto.UserId}>");
+
+		User user = userList[0];
+		if (user.BioId == null) {
+			_logger.LogInformation("No bio found, creating one");
+			return await CreateBioFromId(bioDto, cancellationToken);
+		}
+
+		await _dbContext.Biographies
+			.Where(x => x.UserId == bioDto.UserId)
+			.ExecuteUpdateAsync(x => x
+				.SetProperty(x => x.Text, bioDto.Text)
+			, cancellationToken);
+
+		return user;
+	}
+
+	public async Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default) {
+		var queryable = _dbContext.Biographies
+			.Where(x => x.UserId == userId);
+
+		List<Bio> bioList = await queryable.ToListAsync(cancellationToken: cancellationToken);
+		if (bioList.Count != 1)
+			throw new RepositoryException($"Found <{bioList.Count}> bio for id <{userId}>");
+
+		return bioList[0].Text;
+	}
+
+	public async Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default) {
+		var queryableBio = _dbContext.Biographies
+			.Where(x => x.UserId == userId);
+
+		List<Bio> bioList = await queryableBio.ToListAsync(cancellationToken: cancellationToken);
+		if (bioList.Count != 1)
+			throw new RepositoryException($"Found <{bioList.Count}> bio for id <{userId}>");
+		
+		_dbContext.Remove(bioList[0]);
+
+		var queryableUser = _dbContext.Users
+			.Where(x => x.Id == userId);
+
+		List<User> userList = await queryableUser.ToListAsync(cancellationToken: cancellationToken);
+		if (userList.Count != 1)
+			throw new RepositoryException($"Found <{userList.Count}> users for id <{userId}>");
+
+		User user = userList[0];
+		int? newBioId = null;
+
+		await queryableUser
+			.ExecuteUpdateAsync(x => x
+				.SetProperty(x => x.BioId, newBioId)
+			, cancellationToken);
+
+		return user;
 	}
 }

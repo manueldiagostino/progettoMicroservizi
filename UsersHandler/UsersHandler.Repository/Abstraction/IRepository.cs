@@ -15,9 +15,15 @@ public interface IRepository {
 	Task<User> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default);
 	Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default);
 
-	// Operazioni CRUD per Image
+	// Operazioni CRUD per ProPicture
 	Task<string?> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default);
 	Task<string?> GetProfilePictureFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<User> UploadProfilePictureFromId(int userId, string picturePath, CancellationToken cancellationToken = default);
 	Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default);
+
+	// Operazioni CRUD per Bio
+	public Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default);
+	Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default); 
+	Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default); 
+	Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default); 
 }

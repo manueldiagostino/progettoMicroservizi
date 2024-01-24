@@ -20,4 +20,10 @@ public interface IBusiness {
 	Task<string?> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default);
 	Task<string?> GetProfilePictureFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default);
+
+	// Operazioni CRUD per Bio
+	public Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default);
+	Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default); 
+	Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default); 
+	Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default); 
 }

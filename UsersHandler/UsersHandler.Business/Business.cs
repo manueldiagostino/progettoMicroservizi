@@ -113,9 +113,52 @@ public class Business : IBusiness {
 		if (userId <= 0)
 			throw new RepositoryException("userId <= 0", nameof(userId));
 
-		User user = await _repository.DeleteImage(userId);
+		User user = await _repository.DeleteImage(userId, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Profile picture for id <{userId}> deleted");
+
+		return user;
+	}
+
+	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+		if (bioDto == null)
+			throw new RepositoryException("bioDto == null", nameof(BioDto));
+		
+		User user = await _repository.CreateBioFromId(bioDto, cancellationToken);
+		await _repository.SaveChangesAsync(cancellationToken);
+		_logger.LogInformation($"Created bio for user <{user.Id},{user.Username}>");
+
+		return user;
+	}
+
+	public async Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+		if (bioDto == null)
+			throw new RepositoryException("bioDto == null", nameof(BioDto));
+		
+		User user = await _repository.SetBioFromId(bioDto, cancellationToken);
+		await _repository.SaveChangesAsync(cancellationToken);
+		_logger.LogInformation($"Set bio for user <{user.Id},{user.Username}>");
+
+		return user;
+	}
+
+	public async Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default) {
+		if (userId <= 0)
+			throw new RepositoryException("userId <= 0", nameof(userId));
+
+		string? bio = await _repository.GetBioFromId(userId, cancellationToken);
+		_logger.LogInformation($"Got bio for user id <{userId}>");
+
+		return bio;
+	}
+
+	public async Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default) {
+		if (userId <= 0)
+			throw new RepositoryException("userId <= 0", nameof(userId));
+
+		User user = await _repository.DeleteBioFromId(userId, cancellationToken);
+		await _repository.SaveChangesAsync(cancellationToken);
+		_logger.LogInformation($"Deleted bio for user id <{user.Id},{user.Username}>");
 
 		return user;
 	}

@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-	c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sample.ImageUpload.Api", Version = "v1" });  
+	c.SwaggerDoc("v1", new OpenApiInfo { Title = "UsersHandlerApi", Version = "v1" });  
     c.OperationFilter<ImageUploadOperationFilter>();
 });
 builder.Services.AddLogging(logging => logging.AddConsole());
