@@ -1,17 +1,17 @@
 version: '3.1'
 
 services:
-    users_dbms:
+    scores_dbms:
         image: postgres
-        container_name: users_dbms
-        hostname: users_dbms
+        container_name: scores_dbms
+        hostname: scores_dbms
         restart: always
         ports:
-            - 10001:5432
+            - 10002:5432
         env_file:
-            - ../../UsersHandler.Repository/Database/.env
+            - ../../MusicalScoresHandler.Repository/Database/.env
         volumes:
-            - ../../UsersHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
+            - ../../MusicalScoresHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
     adminer:
         image: adminer
         container_name: adminer

@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Api", "MusicalScoresHandler.Api\MusicalScoresHandler.Api.csproj", "{5D2A9981-9EDD-49C6-A2CA-888199D57961}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Repository", "MusicalScoresHandler.Repository\MusicalScoresHandler.Repository.csproj", "{5191AC1D-E2B3-41B1-9A65-072FB537D7F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Business", "MusicalScoresHandler.Business\MusicalScoresHandler.Business.csproj", "{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Shared", "MusicalScoresHandler.Shared\MusicalScoresHandler.Shared.csproj", "{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D2A9981-9EDD-49C6-A2CA-888199D57961}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D2A9981-9EDD-49C6-A2CA-888199D57961}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D2A9981-9EDD-49C6-A2CA-888199D57961}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D2A9981-9EDD-49C6-A2CA-888199D57961}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5191AC1D-E2B3-41B1-9A65-072FB537D7F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5191AC1D-E2B3-41B1-9A65-072FB537D7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5191AC1D-E2B3-41B1-9A65-072FB537D7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5191AC1D-E2B3-41B1-9A65-072FB537D7F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

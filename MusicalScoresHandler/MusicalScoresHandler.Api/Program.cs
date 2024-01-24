@@ -1,9 +1,9 @@
-using UsersHandler.Business;
-// using UsersHandler.Business.Abstraction;
-// using UsersHandler.Controllers;
-using UsersHandler.Repository;
-using UsersHandler.Repository.Abstraction;
-using UsersHandler.Business.Abstraction;
+// using MusicalScoresHandler.Business;
+// using MusicalScoresHandler.Business.Abstraction;
+// using MusicalScoresHandler.Controllers;
+using MusicalScoresHandler.Repository;
+using MusicalScoresHandler.Repository.Abstraction;
+// using MusicalScoresHandler.Business.Abstraction;
 using GlobalUtility.Manager;
 using Microsoft.OpenApi.Models;
 
@@ -13,15 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-	c.SwaggerDoc("v1", new OpenApiInfo { Title = "UsersHandlerApi", Version = "v1" });  
+	c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicalScoresHandlerApi", Version = "v1" });  
     c.OperationFilter<FileUploadOperationFilter>();
 });
 builder.Services.AddLogging(logging => logging.AddConsole());
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<UsersHandlerDbContext>();
-builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<IBusiness, Business>();
+builder.Services.AddDbContext<MusicalScoresHandlerDbContext>();
+builder.Services.AddScoped<IMusicalScoresRepository, MusicalScoresRepository>();
+// builder.Services.AddScoped<IBusiness, Business>();
 
 var app = builder.Build();
 
