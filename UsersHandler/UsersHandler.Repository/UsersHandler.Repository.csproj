@@ -7,10 +7,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
-
-
-	<ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
+    <ProjectReference Include="../../GlobalUtility/GlobalUtility.Manager/GlobalUtility.Manager.csproj" />
+    <ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UsersHandler.Shared\UsersHandler.Shared.csproj" />
   </ItemGroup>
 </Project>

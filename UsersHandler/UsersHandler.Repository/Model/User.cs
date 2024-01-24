@@ -11,7 +11,7 @@ public class User {
 	public string? Surname { get; set; }
 	public string? PropicPath { get; set; }
 	public long Timestamp { get; set; }
-	public int BioId { get; set; }
+	public int? BioId { get; set; }
 	public string Salt { get; set; }
 	public string Hash { get; set; }
 

@@ -1,14 +1,14 @@
-using UsersHandler.Repository.Model;
 using SixLabors.ImageSharp;
+using UsersHandler.Repository.Model;
 using UsersHandler.Shared;
+using Microsoft.AspNetCore.Http;
 
-namespace UsersHandler.Repository.Abstraction;
+namespace UsersHandler.Business.Abstraction;
 
-public interface IRepository {
-	Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+public interface IBusiness {
 
 	// Operazioni CRUD per User
-	Task CreateUser(UserDto userDto, CancellationToken cancellationToken = default);
+	public Task<int?> CreateUser(UserDto userDto, CancellationToken cancellationToken = default);
 	Task<User> GetUserFromId(int userId, CancellationToken cancellationToken = default);
 	Task<User> GetUserFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<int> GetIdFromUsername(string username, CancellationToken cancellationToken = default);
@@ -16,8 +16,8 @@ public interface IRepository {
 	Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default);
 
 	// Operazioni CRUD per Image
+	public Task<User> UploadProfilePictureFromId(int userId, IFormFile profilePicture, CancellationToken cancellationToken = default);
 	Task<string?> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default);
 	Task<string?> GetProfilePictureFromUsername(string username, CancellationToken cancellationToken = default);
-	Task<User> UploadProfilePictureFromId(int userId, string picturePath, CancellationToken cancellationToken = default);
 	Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default);
 }
