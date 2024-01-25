@@ -9,7 +9,8 @@ public class MusicalScoresHandlerDbContext : DbContext {
 	public DbSet<Genre> Genres { get; set; }
 	public DbSet<MusicalScore> MusicalScores { get; set; }
 	public DbSet<PdfFile> PdfFiles { get; set; }
-	public DbSet<ScoreGenreRelationship> ScoreGenreRelationship { get; set; }
+	public DbSet<ScoreGenreRelationship> ScoreGenreRelationships { get; set; }
+	public DbSet<Copyright> Copyrights { get; set; }
 	
 	public MusicalScoresHandlerDbContext(IConfiguration configuration) {
 		Configuration = configuration;
@@ -20,10 +21,14 @@ public class MusicalScoresHandlerDbContext : DbContext {
 		modelBuilder.Entity<ScoreGenreRelationship>().HasKey(x => x.Id);
 		modelBuilder.Entity<ScoreGenreRelationship>()
 			.HasOne(x => x.Genre)
-			.WithMany(g => g.ScoreGenreRelationship);
+			.WithMany(g => g.ScoreGenreRelationship)
+			.HasForeignKey(x => x.GenreId)
+			.OnDelete(DeleteBehavior.Cascade);
 		modelBuilder.Entity<ScoreGenreRelationship>()
 			.HasOne(x => x.MusicalScore)
-			.WithMany(s => s.ScoreGenreRelationship);
+			.WithMany(s => s.ScoreGenreRelationship)
+			.HasForeignKey(x => x.ScoreId)
+			.OnDelete(DeleteBehavior.Cascade);
 		modelBuilder.Entity<ScoreGenreRelationship>().Property(x => x.Id).HasColumnName("id");
 		modelBuilder.Entity<ScoreGenreRelationship>().Property(x => x.ScoreId).HasColumnName("score_id");
 		modelBuilder.Entity<ScoreGenreRelationship>().Property(x => x.GenreId).HasColumnName("genre_id");
@@ -61,11 +66,13 @@ public class MusicalScoresHandlerDbContext : DbContext {
 		modelBuilder.Entity<PdfFile>()
 			.HasOne(x => x.MusicalScore)
 			.WithMany(s => s.PdfFiles)
-			.HasForeignKey(x => x.MusicalScoreId);
+			.HasForeignKey(x => x.MusicalScoreId)
+			.OnDelete(DeleteBehavior.Cascade);
 		modelBuilder.Entity<PdfFile>()
 			.HasOne(x => x.Copyright)
 			.WithMany(f => f.PdfFiles)
-			.HasForeignKey(x => x.CopyrightId);
+			.HasForeignKey(x => x.CopyrightId)
+			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<PdfFile>().Property(x => x.Id).HasColumnName("id");
 		modelBuilder.Entity<PdfFile>().Property(x => x.MusicalScoreId).HasColumnName("musical_score_id");

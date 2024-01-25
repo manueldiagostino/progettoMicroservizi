@@ -2,6 +2,18 @@
 
 \connect "postgres";
 
+DROP TABLE IF EXISTS "copyright";
+DROP SEQUENCE IF EXISTS copyright_id_seq;
+CREATE SEQUENCE copyright_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."copyright" (
+    "id" integer DEFAULT nextval('copyright_id_seq') NOT NULL,
+    "name" character varying(256) NOT NULL,
+    CONSTRAINT "copyright_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+TRUNCATE "copyright";
+
 DROP TABLE IF EXISTS "genre";
 DROP SEQUENCE IF EXISTS genre_id_seq;
 CREATE SEQUENCE genre_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
@@ -66,7 +78,10 @@ CREATE TABLE "public"."score_genre_relationship" (
 
 TRUNCATE "score_genre_relationship";
 
-ALTER TABLE ONLY "public"."score_genre_relationship" ADD CONSTRAINT "score_genre_relationship_genre_id_fkey" FOREIGN KEY (genre_id) REFERENCES genre(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."pdf_file" ADD CONSTRAINT "pdf_file_copyright_id_fkey" FOREIGN KEY (copyright_id) REFERENCES copyright(id) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."pdf_file" ADD CONSTRAINT "pdf_file_musical_score_id_fkey" FOREIGN KEY (musical_score_id) REFERENCES musical_score(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."score_genre_relationship" ADD CONSTRAINT "score_genre_relationship_genre_id_fkey" FOREIGN KEY (genre_id) REFERENCES genre(id) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."score_genre_relationship" ADD CONSTRAINT "score_genre_relationship_score_id_fkey" FOREIGN KEY (score_id) REFERENCES musical_score(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-01-24 17:02:49.109602+00
+-- 2024-01-25 09:54:25.731808+00

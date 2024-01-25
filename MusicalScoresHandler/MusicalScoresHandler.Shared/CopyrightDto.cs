@@ -1,5 +1,5 @@
 namespace MusicalScoresHandler.Shared;
 
 public class CopyrightDto {
-	string Name { get; set; }
+	public string Name { get; set; }
 }
