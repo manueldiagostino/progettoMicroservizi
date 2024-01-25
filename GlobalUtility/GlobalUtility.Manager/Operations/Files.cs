@@ -2,52 +2,67 @@ using Microsoft.AspNetCore.Http;
 using SixLabors.ImageSharp;
 
 namespace GlobalUtility.Manager.Operations;
-public class Files {
-	public static string? SaveFileToDir(string destDir, IFormFile target) {
+public class Files
+{
+	public static string? SaveFileToDir(string destDir, IFormFile target)
+	{
 		if (string.IsNullOrWhiteSpace(destDir))
 			return null;
 
-		try {
+		try
+		{
 
-			if (!Directory.Exists(destDir)) {
+			if (!Directory.Exists(destDir))
+			{
 				Directory.CreateDirectory(destDir);
 			}
-			string fileName = PasswordHasher.GetCurrentTimestampInSeconds().ToString() + Path.GetExtension(target.FileName);
+			string fileName = GenerateRandomString(23) + target.FileName;
 			string filePath = Path.Combine(destDir, fileName);
 
-			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
+			using (var fileStream = new FileStream(filePath, FileMode.Create))
+			{
 				target.CopyTo(fileStream);
 			}
 
 			Console.WriteLine($"File written in: {filePath}");
 			return filePath;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex)
+		{
 			Console.WriteLine($"An error occured while saving the file: {ex.Message}");
 			return null;
 		}
 	}
 
-	public static bool DeleteFileIfExists(string filePath) {
+	public static bool DeleteFileIfExists(string filePath)
+	{
 		if (string.IsNullOrWhiteSpace(filePath))
 			return false;
 
-		try {
+		try
+		{
 
-			if (File.Exists(filePath)) {
+			if (File.Exists(filePath))
+			{
 				File.Delete(filePath);
 				Console.WriteLine($"Removed file: {filePath}");
 				return true;
-			} else {
+			}
+			else
+			{
 				Console.WriteLine($"No such file: {filePath}");
 				return false;
 			}
-		} catch (Exception ex) {
+		}
+		catch (Exception ex)
+		{
 			Console.WriteLine($"An error occured while deleting: {ex.Message}");
 			return false;
 		}
 	}
 
-	public static string? GetAbsolutePath(string relativePath) {
+	public static string? GetAbsolutePath(string relativePath)
+	{
 		if (string.IsNullOrWhiteSpace(relativePath))
 			return relativePath;
 
@@ -58,5 +73,18 @@ public class Files {
 		absolutePath = Path.GetFullPath(new Uri(absolutePath).LocalPath);
 
 		return absolutePath;
+	}
+
+
+	static string GenerateRandomString(int length) {
+		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		Random random = new Random();
+
+		char[] randomArray = new char[length];
+		for (int i = 0; i < length; i++) {
+			randomArray[i] = chars[random.Next(chars.Length)];
+		}
+
+		return new string(randomArray);
 	}
 }
