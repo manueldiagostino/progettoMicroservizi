@@ -1,82 +1,75 @@
+using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 
 namespace GlobalUtility.Manager.Operations;
-public class Files
-{
-	public static string? SaveFileToDir(string destDir, IFormFile target)
-	{
+public class Files {
+	public static readonly string ProjectName;
+
+	static Files() {
+		ProjectName = "MSL"; // Musical Scores Library
+	}
+
+	public static string SaveFileToDir(string destDir, IFormFile target) {
 		if (string.IsNullOrWhiteSpace(destDir))
-			return null;
+			throw new Exception($"IsNullOrWhiteSpace(destDir)");
 
-		try
-		{
+		try {
 
-			if (!Directory.Exists(destDir))
-			{
+			if (!Directory.Exists(destDir)) {
 				Directory.CreateDirectory(destDir);
 			}
-			string fileName = GenerateRandomString(23) + target.FileName;
+			string fileName = ProjectName + '_' + GenerateRandomString(23) + '_' + target.FileName;
 			string filePath = Path.Combine(destDir, fileName);
 
-			using (var fileStream = new FileStream(filePath, FileMode.Create))
-			{
+			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
 				target.CopyTo(fileStream);
 			}
 
-			Console.WriteLine($"File written in: {filePath}");
+			Console.WriteLine($"File saved into <{filePath}>");
 			return filePath;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"An error occured while saving the file: {ex.Message}");
-			return null;
+		} catch (Exception ex) {
+			throw new Exception($"An error occured while saving the file: {ex.Message}");
 		}
 	}
 
-	public static bool DeleteFileIfExists(string filePath)
-	{
+	public static bool DeleteFileIfExists(string filePath) {
 		if (string.IsNullOrWhiteSpace(filePath))
 			return false;
 
-		try
-		{
+		try {
 
-			if (File.Exists(filePath))
-			{
+			if (File.Exists(filePath)) {
 				File.Delete(filePath);
-				Console.WriteLine($"Removed file: {filePath}");
+				Console.WriteLine($"Removed file <{filePath}>");
 				return true;
-			}
-			else
-			{
-				Console.WriteLine($"No such file: {filePath}");
+			} else {
+				Console.WriteLine($"No such file <{filePath}>");
 				return false;
 			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"An error occured while deleting: {ex.Message}");
+		} catch (Exception ex) {
+			Console.WriteLine($"An error occured while deleting <{ex.Message}>");
 			return false;
 		}
 	}
 
-	public static string? GetAbsolutePath(string relativePath)
-	{
+	public static string? GetAbsolutePath(string relativePath) {
 		if (string.IsNullOrWhiteSpace(relativePath))
-			return relativePath;
+			return null;
 
-		string applicationPath = AppDomain.CurrentDomain.BaseDirectory;
+		string absolutePath = Path.GetFullPath(relativePath);
 
-		string absolutePath = Path.Combine(applicationPath, relativePath);
+		// string applicationPath = AppDomain.CurrentDomain.BaseDirectory;
 
-		absolutePath = Path.GetFullPath(new Uri(absolutePath).LocalPath);
+		// string absolutePath = Path.Combine(applicationPath, relativePath);
+
+		// absolutePath = Path.GetFullPath(new Uri(absolutePath).LocalPath);
 
 		return absolutePath;
 	}
 
-
-	static string GenerateRandomString(int length) {
+	public static string GenerateRandomString(int length) {
 		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		Random random = new Random();
 
@@ -86,5 +79,27 @@ public class Files
 		}
 
 		return new string(randomArray);
+	}
+
+	public static FileStreamResult GenerateZipArchive(List<string> files, string zipFileName = "") {
+		zipFileName = string.IsNullOrEmpty(zipFileName)? ProjectName + '_' + GenerateRandomString(23) + ".zip" : zipFileName;
+
+		// Percorso temporaneo per creare il file ZIP
+		string tempPath = Path.Combine(Path.GetTempPath(), zipFileName);
+
+		// Crea il file ZIP
+		using (var zipArchive = ZipFile.Open(tempPath, ZipArchiveMode.Create)) {
+			foreach (string file in files) {
+				// Aggiungi ogni file PDF al file ZIP
+				zipArchive.CreateEntryFromFile(file, Path.GetFileName(file));
+			}
+		}
+
+		FileStreamResult result = new FileStreamResult(new FileStream(tempPath, FileMode.Open), "application/zip");
+		File.Delete(tempPath);
+
+		result.FileDownloadName = zipFileName;
+
+		return result;
 	}
 }
