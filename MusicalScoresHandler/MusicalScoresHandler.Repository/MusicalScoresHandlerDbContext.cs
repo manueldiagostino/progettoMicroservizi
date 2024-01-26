@@ -17,7 +17,7 @@ public class MusicalScoresHandlerDbContext : DbContext {
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder) {
-		modelBuilder.Entity<ScoreGenreRelationship>().ToTable("score_genre_relathionship");
+		modelBuilder.Entity<ScoreGenreRelationship>().ToTable("score_genre_relationship");
 		modelBuilder.Entity<ScoreGenreRelationship>().HasKey(x => x.Id);
 		modelBuilder.Entity<ScoreGenreRelationship>()
 			.HasOne(x => x.Genre)

@@ -1,11 +1,10 @@
-// using MusicalScoresHandler.Business;
-// using MusicalScoresHandler.Business.Abstraction;
-// using MusicalScoresHandler.Controllers;
 using MusicalScoresHandler.Repository;
 using MusicalScoresHandler.Repository.Abstraction;
-// using MusicalScoresHandler.Business.Abstraction;
 using GlobalUtility.Manager;
 using Microsoft.OpenApi.Models;
+using MusicalScoresHandler.Repository.Repository;
+using MusicalScoresHandler.Business.Abstraction;
+using MusicalScoresHandler.Business.Business;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +19,13 @@ builder.Services.AddLogging(logging => logging.AddConsole());
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<MusicalScoresHandlerDbContext>();
+builder.Services.AddScoped<ICopyrightRepository, CopyrightRepository>();
+builder.Services.AddScoped<IGenresRepository, GenresRepository>();
+builder.Services.AddScoped<IScoreGenreRelationshipRepository, ScoreGenreRelationshipRepository>();
+builder.Services.AddScoped<IPdfFilesRepository, PdfFilesRepository>();
 builder.Services.AddScoped<IMusicalScoresRepository, MusicalScoresRepository>();
-// builder.Services.AddScoped<IBusiness, Business>();
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IBusiness, Business>();
 
 var app = builder.Build();
 

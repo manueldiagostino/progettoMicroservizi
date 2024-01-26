@@ -33,16 +33,35 @@ public class ScoreGenreRelationshipRepository : IScoreGenreRelationshipRepositor
 		return scoreGenreRelationship ?? throw new RepositoryException($"Found no scoreGenreRelationship for name <{JsonSerializer.Serialize(relationshipDto)}>");
 	}
 
-	public async Task<List<ScoreGenreRelationship>> GetAllScoreGenreRelationships(CancellationToken cancellationToken = default) {
-		return await _dbContext.ScoreGenreRelationships.ToListAsync(cancellationToken);
+	public async Task<List<ScoreGenreRelationshipDto>> GetAllScoreGenreRelationships(CancellationToken cancellationToken = default) {
+		List<ScoreGenreRelationship> srList = await _dbContext.ScoreGenreRelationships.ToListAsync(cancellationToken);
+		List<ScoreGenreRelationshipDto> result = new List<ScoreGenreRelationshipDto>();
+
+		foreach (var item in srList) {
+			result.Add(new ScoreGenreRelationshipDto {
+				ScoreId = item.ScoreId,
+				GenreId = item.GenreId
+			});
+		}
+
+		return result;
 	}
 
-	public async Task<List<Genre>> GetAllScoreGenres(int scoreId, CancellationToken cancellationToken = default) {
-		return await _dbContext.ScoreGenreRelationships
+	public async Task<List<GenreDto>> GetAllScoreGenres(int scoreId, CancellationToken cancellationToken = default) {
+		List<Genre> genresList = await _dbContext.ScoreGenreRelationships
 			.Where(sgr => sgr.ScoreId == scoreId)
 			.Include(sgr => sgr.Genre) // navigazione alla tabella Genres
 			.Select(sgr => sgr.Genre)
 			.ToListAsync(cancellationToken);
+
+		List<GenreDto> result = new List<GenreDto>();
+		foreach (var item in genresList) {
+			result.Add(new GenreDto {
+				Name = item.Name,
+			});
+		}
+
+		return result;
 	}
 
 	public async Task<ScoreGenreRelationship> DeleteScoreGenreRelationship(int id, CancellationToken cancellationToken = default) {

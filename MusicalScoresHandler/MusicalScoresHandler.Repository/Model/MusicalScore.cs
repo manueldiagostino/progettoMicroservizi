@@ -8,8 +8,7 @@ public class MusicalScore {
 	public string? Description { get; set; }
 	public string? Opus { get; set; }
 	public int AuthorId { get; set; }
-
-	public Genre Genre { get; set; }
+	
 	public ICollection<PdfFile> PdfFiles { get; set; }
 	public ICollection<ScoreGenreRelationship> ScoreGenreRelationship { get; set; }
 }

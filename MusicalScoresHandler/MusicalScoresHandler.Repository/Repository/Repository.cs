@@ -37,45 +37,37 @@ namespace MusicalScoresHandler.Repository.Repository {
 
 		public async Task CreateGenre(GenreDto genreDto, CancellationToken cancellationToken = default) {
 			await _genresRepository.CreateGenre(genreDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		public async Task CreateMusicalScore(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
 			await _musicalScoresRepository.CreateMusicalScore(musicalScoreDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		public async Task CreatePdfFile(PdfFileDto pdfFileDto, CancellationToken cancellationToken = default) {
 			await _pdfFilesRepository.CreatePdfFile(pdfFileDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		public async Task CreateScoreGenreRelationship(ScoreGenreRelationshipDto relationshipDto, CancellationToken cancellationToken = default) {
 			await _scoreGenreRelationshipRepository.CreateScoreGenreRelationship(relationshipDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		public async Task<Genre> DeleteGenre(string name, CancellationToken cancellationToken = default) {
 			var genre = await _genresRepository.DeleteGenre(name, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return genre;
 		}
 
 		public async Task<MusicalScore> DeleteMusicalScore(int id, CancellationToken cancellationToken = default) {
 			var musicalScore = await _musicalScoresRepository.DeleteMusicalScore(id, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return musicalScore;
 		}
 
 		public async Task<PdfFile> DeletePdfFile(int id, CancellationToken cancellationToken = default) {
 			var pdfFile = await _pdfFilesRepository.DeletePdfFile(id, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return pdfFile;
 		}
 
 		public async Task<ScoreGenreRelationship> DeleteScoreGenreRelationship(int id, CancellationToken cancellationToken = default) {
 			var scoreGenreRelationship = await _scoreGenreRelationshipRepository.DeleteScoreGenreRelationship(id, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return scoreGenreRelationship;
 		}
 
@@ -87,11 +79,11 @@ namespace MusicalScoresHandler.Repository.Repository {
 			return await _musicalScoresRepository.GetAllMusicalScores(cancellationToken);
 		}
 
-		public async Task<List<ScoreGenreRelationship>> GetAllScoreGenreRelationships(CancellationToken cancellationToken = default) {
+		public async Task<List<ScoreGenreRelationshipDto>> GetAllScoreGenreRelationships(CancellationToken cancellationToken = default) {
 			return await _scoreGenreRelationshipRepository.GetAllScoreGenreRelationships(cancellationToken);
 		}
 
-		public async Task<List<Genre>> GetAllScoreGenres(int scoreId, CancellationToken cancellationToken = default) {
+		public async Task<List<GenreDto>> GetAllScoreGenres(int scoreId, CancellationToken cancellationToken = default) {
 			return await _scoreGenreRelationshipRepository.GetAllScoreGenres(scoreId, cancellationToken);
 		}
 
@@ -125,19 +117,20 @@ namespace MusicalScoresHandler.Repository.Repository {
 
 		public async Task<Genre> UpdateGenre(GenreDto genreDto, CancellationToken cancellationToken = default) {
 			Genre genre = await _genresRepository.UpdateGenre(genreDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return genre;
 		}
 
 		public async Task<MusicalScore> UpdateMusicalScore(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
 			MusicalScore musicalScore = await _musicalScoresRepository.UpdateMusicalScore(musicalScoreDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
 			return musicalScore;
 		}
 
-		public async Task UpdatePdfFile(PdfFileDto pdfFileDto, CancellationToken cancellationToken = default) {
-			await _pdfFilesRepository.UpdatePdfFile(pdfFileDto, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
+		public async Task<PdfFile> UpdatePdfFileInfo(int fileId, PdfFileReadDto pdfFileReadDto, CancellationToken cancellationToken = default) {
+			return await _pdfFilesRepository.UpdatePdfFileInfo(fileId, pdfFileReadDto, cancellationToken);
+		}
+
+		public async Task<PdfFile> UpdatePdfFile(int fileId, string newPath, CancellationToken cancellationToken = default) {
+			return await _pdfFilesRepository.UpdatePdfFile(fileId, newPath, cancellationToken);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using GlobalUtility.Manager.Exceptions;
+using GlobalUtility.Manager.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MusicalScoreDtosHandler.Shared;
@@ -34,6 +35,12 @@ public class PdfFilesRepository : IPdfFilesRepository {
 	public async Task<PdfFile> DeletePdfFile(int id, CancellationToken cancellationToken = default) {
 		PdfFile pdfFile = await GetUnique(id, cancellationToken);
 
+		string? filePath = pdfFile.Path;
+		bool deleted = Files.DeleteFileIfExists(filePath);
+
+		if (deleted)
+			_logger.LogInformation($"File {filePath} deleted from disk");
+
 		_dbContext.Remove(pdfFile);
 		return pdfFile;
 	}
@@ -43,6 +50,9 @@ public class PdfFilesRepository : IPdfFilesRepository {
 			.Where(x => x.MusicalScoreId == scoreId)
 			.ToListAsync(cancellationToken);
 		
+		if (pdfFileList.Count == 0)
+			throw new RepositoryException($"Found <{pdfFileList.Count}> pdf files for scoreId <{scoreId}>");
+
 		return pdfFileList;
 	}
 
@@ -50,19 +60,18 @@ public class PdfFilesRepository : IPdfFilesRepository {
 		return await GetUnique(id, cancellationToken);
 	}
 
-	public async Task UpdatePdfFile(PdfFileDto pdfFileDto, CancellationToken cancellationToken = default) {
-		
-		var queryable = GetQueryable(pdfFileDto.Path);
+	public async Task<PdfFile> UpdatePdfFileInfo(int fileId, PdfFileReadDto pdfFileReadDto, CancellationToken cancellationToken = default) {
+		var queryable = GetQueryable(fileId);
 
 		await queryable.ExecuteUpdateAsync(x => x
-			.SetProperty(x => x.Path, pdfFileDto.Path)
-			.SetProperty(x => x.UploadDate, pdfFileDto.UploadDate)
-			.SetProperty(x => x.Publisher, pdfFileDto.Publisher)
-			.SetProperty(x => x.CopyrightId, pdfFileDto.CopyrightId)
-			.SetProperty(x => x.IsUrtext, pdfFileDto.IsUrtext)
-			.SetProperty(x => x.UserId, pdfFileDto.UserId)
-			.SetProperty(x => x.Comments, pdfFileDto.Comments)
+			.SetProperty(x => x.Publisher, pdfFileReadDto.Publisher)
+			.SetProperty(x => x.CopyrightId, pdfFileReadDto.CopyrightId)
+			.SetProperty(x => x.IsUrtext, pdfFileReadDto.IsUrtext)
+			.SetProperty(x => x.UserId, pdfFileReadDto.UserId)
+			.SetProperty(x => x.Comments, pdfFileReadDto.Comments)
 		, cancellationToken: cancellationToken);
+
+		return (await queryable.ToListAsync(cancellationToken: cancellationToken))[0];
 	}
 
 	private IQueryable<PdfFile> GetQueryable(int id) {
@@ -95,6 +104,24 @@ public class PdfFilesRepository : IPdfFilesRepository {
 			throw new RepositoryException($"Found <{pdfFileList.Count}> pdf files for path <{path}>");
 
 		return pdfFileList[0];
+	}
+
+	public async Task<PdfFile> UpdatePdfFile(int fileId, string newPath, CancellationToken cancellationToken = default) {
+		var queryable = GetQueryable(fileId);
+		PdfFile pdfFile = await GetUnique(fileId);
+
+
+		string? filePath = pdfFile.Path;
+		bool deleted = Files.DeleteFileIfExists(filePath);
+
+		if (deleted)
+			_logger.LogInformation($"File {filePath} deleted from disk");
+
+		await queryable.ExecuteUpdateAsync(x => x
+			.SetProperty(x => x.Path, newPath)
+		, cancellationToken: cancellationToken);
+
+		return (await queryable.ToListAsync(cancellationToken: cancellationToken))[0];
 	}
 }
 
