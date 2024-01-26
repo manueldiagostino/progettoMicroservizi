@@ -56,3 +56,55 @@ services:
             dockerfile: AuthorsHandler/AuthorsHandler.Api/Dockerfile
         ports:
             - 5000:5134
+
+    # Utenti
+    users_dbms:
+        image: postgres
+        container_name: users_dbms
+        hostname: users_dbms
+        restart: always
+        ports:
+            - 10001:5432
+        env_file:
+            - ./UsersHandler/UsersHandler.Repository/Database/.env
+        volumes:
+            - ./UsersHandler/UsersHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
+
+    users_microservice:
+        depends_on:
+            - users_dbms
+            - adminer
+            - kafka
+            - zookeeper
+        image: users_microservice
+        build:
+            context: .
+            dockerfile: UsersHandler/UsersHandler.Api/Dockerfile
+        ports:
+            - 5001:5134
+
+     # Spartiti
+    scores_dbms:
+        image: postgres
+        container_name: scores_dbms
+        hostname: scores_dbms
+        restart: always
+        ports:
+            - 10002:5432
+        env_file:
+            - ./MusicalScoresHandler/MusicalScoresHandler.Repository/Database/.env
+        volumes:
+            - ./MusicalScoresHandler/MusicalScoresHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
+
+    scores_microservice:
+        depends_on:
+            - users_dbms
+            - adminer
+            - kafka
+            - zookeeper
+        image: scores_microservice
+        build:
+            context: .
+            dockerfile: MusicalScoresHandler/MusicalScoresHandler.Api/Dockerfile
+        ports:
+            - 5002:5134

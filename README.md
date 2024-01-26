@@ -44,3 +44,25 @@ Segue la mappatura di rete utilizzata:
 > N.B.
 > Una volta che un microservizio è lanciato in maniera containerizzata, la __connectionString__ cambia in quanto non si usa più `Host=localhost` ma il nome del microservizio, ad es. `Host=authors_dbms` (si occupa docker di fare da DNS). Per questo motivo ci sono due diversi `appsettings.json` per ogni _Api_.
 
+---
+
+## Per eseguire
+Nella cartella `progettoMicroservizi` eseguire da terminale il comando:
+```bash
+docker compose up -d
+```
+per lanciare tutti i microservizi e relativi DBMS.
+
+Di seguito gli URL per connettersi alle API tramite browser web:
+- [adminer](http://localhost:8080)
+
+	Per connettersi utilizzare i parametri:
+	- Sistema: `PostgreSQL`
+	- Server: `[ authors_dbms | users_dbms | scores_dbms ]`
+	- Utente: `postgres`
+	- Password: `password`
+	- Database: `postgres`
+
+- [authors_API](http://localhost:5000/swagger/index.html)
+- [users_API](http://localhost:5001/swagger/index.html)
+- [musicalScores_API](http://localhost:5002/swagger/index.html)
