@@ -21,6 +21,18 @@ public class UsersController : ControllerBase {
 		_logger = logger;
 	}
 
+	private bool ValidateFile(IFormFile file) {
+
+		var fileExtension = Path.GetExtension(file.FileName);
+		var allowedExtensions = new[] { ".png", ".jpeg", ".jpg" };
+
+		if (!allowedExtensions.Contains(fileExtension.ToLower())) {
+			return false;
+		}
+
+		return true;
+	}
+
 	[HttpPost(Name = "CreateUser")]
 	public async Task<ActionResult> CreateUser([FromQuery] UserDto userDto) {
 		try {
@@ -82,10 +94,18 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpPost(Name = "UploadProfilePictureFromId")]
-	public async Task<IActionResult> UploadProfilePictureFromId([FromQuery] int userId, [FromForm] IFormFile image) {
+	public async Task<IActionResult> UploadProfilePictureFromId([FromQuery] int userId, [FromForm] IFormFile file) {
+		if (file == null || file.Length == 0) {
+			return BadRequest("File not valid");
+		}
+
+		if (!ValidateFile(file)) {
+			return BadRequest($"File extension not allowed");
+		}
+
 		try {
 
-			User user = await _business.UploadProfilePictureFromId(userId, image);
+			User user = await _business.UploadProfilePictureFromId(userId, file);
 			return (user != null) ? Ok($"Uploaded image for {user.Username}") : BadRequest("An error occured");
 
 		} catch (Exception e) {
@@ -94,11 +114,18 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpPost(Name = "UploadProfilePictureFromUsername")]
-	public async Task<IActionResult> UploadProfilePictureFromUsername([FromQuery, Required] string username, [FromForm, Required] IFormFile image) {
+	public async Task<IActionResult> UploadProfilePictureFromUsername([FromQuery, Required] string username, [FromForm, Required] IFormFile file) {
+		if (file == null || file.Length == 0) {
+			return BadRequest("File not valid");
+		}
+
+		if (!ValidateFile(file)) {
+			return BadRequest($"File extension not allowed");
+		}
 		try {
 
 			int id = await _business.GetIdFromUsername(username);
-			User user = await _business.UploadProfilePictureFromId(id, image);
+			User user = await _business.UploadProfilePictureFromId(id, file);
 
 			return Ok($"Uploaded image for <{user.Id},{user.Username}>");
 

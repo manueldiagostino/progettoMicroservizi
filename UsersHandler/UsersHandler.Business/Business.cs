@@ -33,30 +33,30 @@ public class Business : IBusiness {
 
 	public async Task<User> GetUserFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		return await _repository.GetUserFromId(userId, cancellationToken);
 	}
 
 	public async Task<User> GetUserFromUsername(string username, CancellationToken cancellationToken = default) {
 		if (string.IsNullOrWhiteSpace(username))
-			throw new RepositoryException("string.IsNullOrWhiteSpace(username)", nameof(username));
+			throw new BusinessException("string.IsNullOrWhiteSpace(username)", nameof(username));
 
 		return await _repository.GetUserFromUsername(username, cancellationToken);
 	}
 
 	public async Task<int> GetIdFromUsername(string username, CancellationToken cancellationToken = default) {
 		if (string.IsNullOrWhiteSpace(username))
-			throw new RepositoryException("string.IsNullOrWhiteSpace(username)", nameof(username));
+			throw new BusinessException("string.IsNullOrWhiteSpace(username)", nameof(username));
 
 		return await _repository.GetIdFromUsername(username, cancellationToken);
 	}
 
 	public async Task<User> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 		if (string.IsNullOrWhiteSpace(username))
-			throw new RepositoryException("string.IsNullOrWhiteSpace(username)", nameof(username));
+			throw new BusinessException("string.IsNullOrWhiteSpace(username)", nameof(username));
 
 		User user = await _repository.UpdateUsername(userId, username, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -67,7 +67,7 @@ public class Business : IBusiness {
 
 	public async Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		User user = await _repository.DeleteUser(userId, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -79,7 +79,7 @@ public class Business : IBusiness {
 
 	public async Task<string?> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		string? relativePath = await _repository.GetProfilePictureFromId(userId, cancellationToken);
 
@@ -93,14 +93,14 @@ public class Business : IBusiness {
 
 	public async Task<User> UploadProfilePictureFromId(int userId, IFormFile profilePicture, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 		if (profilePicture == null)
-			throw new RepositoryException("profilePicture == null", nameof(profilePicture));
+			throw new BusinessException("profilePicture == null", nameof(profilePicture));
 
 		string? relativePath = Files.SaveFileToDir(Path.Combine("ProfilePictures"), profilePicture);
 
 		if (relativePath == null)
-			throw new RepositoryException("SaveFileToDisk returned path == null");
+			throw new BusinessException("SaveFileToDisk returned path == null");
 
 		var res = await _repository.UploadProfilePictureFromId(userId, relativePath, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -111,7 +111,7 @@ public class Business : IBusiness {
 
 	public async Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		User user = await _repository.DeleteImage(userId, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -122,7 +122,7 @@ public class Business : IBusiness {
 
 	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
-			throw new RepositoryException("bioDto == null", nameof(BioDto));
+			throw new BusinessException("bioDto == null", nameof(BioDto));
 		
 		User user = await _repository.CreateBioFromId(bioDto, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -133,7 +133,7 @@ public class Business : IBusiness {
 
 	public async Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
-			throw new RepositoryException("bioDto == null", nameof(BioDto));
+			throw new BusinessException("bioDto == null", nameof(BioDto));
 		
 		User user = await _repository.SetBioFromId(bioDto, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
@@ -144,7 +144,7 @@ public class Business : IBusiness {
 
 	public async Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		string? bio = await _repository.GetBioFromId(userId, cancellationToken);
 		_logger.LogInformation($"Got bio for user id <{userId}>");
@@ -154,7 +154,7 @@ public class Business : IBusiness {
 
 	public async Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
-			throw new RepositoryException("userId <= 0", nameof(userId));
+			throw new BusinessException("userId <= 0", nameof(userId));
 
 		User user = await _repository.DeleteBioFromId(userId, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
