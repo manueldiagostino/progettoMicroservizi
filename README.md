@@ -40,6 +40,10 @@ Segue la mappatura di rete utilizzata:
 - adminer 8080:8080
 - authors_dbms 10000:5432
 - authors_microservice 5000:5082
+- users_dbms 10001:5432
+- users_microservice 5001:5082
+- scores_dbms 10002:5432
+- scores_microservice 5002:5082
 
 > N.B.
 > Una volta che un microservizio è lanciato in maniera containerizzata, la __connectionString__ cambia in quanto non si usa più `Host=localhost` ma il nome del microservizio, ad es. `Host=authors_dbms` (si occupa docker di fare da DNS). Per questo motivo ci sono due diversi `appsettings.json` per ogni _Api_.
