@@ -14,6 +14,7 @@ public interface IRepository {
 	Task<User> GetUserFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<int> GetIdFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<User> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default);
+	Task<User> UpdatePassword(int userId, string password, CancellationToken cancellationToken = default);
 	Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default);
 
 	// Operazioni CRUD per ProPicture

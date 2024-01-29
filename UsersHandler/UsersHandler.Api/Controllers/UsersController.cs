@@ -7,8 +7,10 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 namespace UsersHandler.Api.Controllers;
 
+using UserOutType = UserTransactionalDto;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -38,10 +40,10 @@ public class UsersController : ControllerBase {
 		try {
 
 			int? res = await _business.CreateUser(userDto);
-			return (res == 1) ? Ok($"User {userDto.Username} added") : BadRequest("No users added");
+			return (res == 1) ? Ok($"User <{userDto.Username}> added") : BadRequest("No users added");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -53,7 +55,7 @@ public class UsersController : ControllerBase {
 			return Ok($"User <{username}> has id <{id}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -61,11 +63,23 @@ public class UsersController : ControllerBase {
 	public async Task<ActionResult> GetUsernameFromId([FromQuery] int id) {
 		try {
 
-			User user = await _business.GetUserFromId(id);
-			return Ok($"User <{user.Id}> has username <{user.Username}>");
+			UserOutType user = await _business.GetUserFromId(id);
+			return Ok($"User <{user.UserId}> has username <{user.Username}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
+		}
+	}
+
+	[HttpGet(Name = "GetUserFromId")]
+	public async Task<ActionResult> GetUserFromId([FromQuery] int id) {
+		try {
+
+			UserOutType user = await _business.GetUserFromId(id);
+			return Ok($"{JsonSerializer.Serialize(user)}");
+
+		} catch (Exception e) {
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -73,11 +87,11 @@ public class UsersController : ControllerBase {
 	public async Task<ActionResult> UpdateUsername([FromQuery] int id, string username) {
 		try {
 
-			User user = await _business.UpdateUsername(id, username);
-			return Ok($"Updated user <{user.Id},{user.Username}> with username <{username}> ");
+			UserOutType user = await _business.UpdateUsername(id, username);
+			return Ok($"Updated user <{user.UserId},{user.Username}> with username <{username}> ");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -85,11 +99,35 @@ public class UsersController : ControllerBase {
 	public async Task<ActionResult> DeleteUser([FromQuery] int id) {
 		try {
 
-			User user = await _business.DeleteUser(id);
-			return Ok($"User <{user.Id}, {user.Username}> deleted");
+			UserOutType user = await _business.DeleteUser(id);
+			return Ok($"User <{user.UserId}, {user.Username}> deleted");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
+		}
+	}
+
+	[HttpGet(Name = "VerifyPassword")]
+	public async Task<ActionResult> VerifyPassword([FromQuery] int userId, string password) {
+		try {
+
+			bool verified = await _business.VerifyPassword(userId, password);
+			return Ok($"{verified}");
+
+		} catch (Exception e) {
+			return BadRequest($"{e}");
+		}
+	}
+
+	[HttpPut(Name = "UpdatePassword")]
+	public async Task<ActionResult> UpdatePassword([FromQuery] int userId, string oldPassword, string newPassword) {
+		try {
+
+			UserOutType user = await _business.UpdatePassword(userId, oldPassword, newPassword);
+			return Ok($"Updated user <{user.UserId},{user.Username}> with the new password");
+
+		} catch (Exception e) {
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -105,11 +143,11 @@ public class UsersController : ControllerBase {
 
 		try {
 
-			User user = await _business.UploadProfilePictureFromId(userId, file);
+			UserOutType user = await _business.UploadProfilePictureFromId(userId, file);
 			return (user != null) ? Ok($"Uploaded image for {user.Username}") : BadRequest("An error occured");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -125,12 +163,12 @@ public class UsersController : ControllerBase {
 		try {
 
 			int id = await _business.GetIdFromUsername(username);
-			User user = await _business.UploadProfilePictureFromId(id, file);
+			UserOutType user = await _business.UploadProfilePictureFromId(id, file);
 
-			return Ok($"Uploaded image for <{user.Id},{user.Username}>");
+			return Ok($"Uploaded image for <{user.UserId},{user.Username}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -145,8 +183,8 @@ public class UsersController : ControllerBase {
 		}
 	}
 
-	[HttpGet("{resultImageName}, {username}")]
-	public async Task<IActionResult> DownloadProfilePicture(string resultImageName, string username) {
+	[HttpGet(Name = "DownloadProfilePicture")]
+	public async Task<IActionResult> DownloadProfilePicture(string username) {
 		try {
 
 			string? imagePath = await _business.GetProfilePictureFromUsername(username);
@@ -154,15 +192,15 @@ public class UsersController : ControllerBase {
 				return NotFound($"No image for user <{username}>");
 
 			if (!System.IO.File.Exists(imagePath)) {
-				return NotFound($"no image for path <{imagePath}>");
+				return NotFound($"No image for path <{imagePath}>");
 			}
 
 			string contentType = GetContentType(imagePath);
 
-			return PhysicalFile(imagePath, contentType, resultImageName);
+			return PhysicalFile(imagePath, contentType, Path.GetFileName(imagePath));
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -170,11 +208,11 @@ public class UsersController : ControllerBase {
 	public async Task<ActionResult> DeleteImage([FromQuery] int id) {
 		try {
 
-			User user = await _business.DeleteImage(id);
-			return Ok($"User <{user.Id}, {user.Username}> deleted");
+			UserOutType user = await _business.DeleteImage(id);
+			return Ok($"User <{user.UserId}, {user.Username}> deleted");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 

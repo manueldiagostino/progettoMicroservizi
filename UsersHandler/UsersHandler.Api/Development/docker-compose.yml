@@ -14,7 +14,7 @@ services:
             - ../../UsersHandler.Repository/Database/scripts:/docker-entrypoint-initdb.d
     users_adminer:
         image: adminer
-        container_name: adminer
+        container_name: users_adminer
         hostname: adminer
         restart: always
         ports:

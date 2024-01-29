@@ -16,17 +16,21 @@ CREATE TABLE "public"."bio" (
 TRUNCATE "bio";
 
 DROP TABLE IF EXISTS "transactional_outbox";
+DROP SEQUENCE IF EXISTS transactional_outbox_id_seq;
+CREATE SEQUENCE transactional_outbox_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
 CREATE TABLE "public"."transactional_outbox" (
-    "id" integer NOT NULL,
-    "table" character varying(50) NOT NULL,
-    "message" character varying(2048) NOT NULL
+    "id" integer DEFAULT nextval('transactional_outbox_id_seq') NOT NULL,
+    "table" character varying(64) NOT NULL,
+    "message" character varying(2048) NOT NULL,
+    CONSTRAINT "transactional_outbox_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
 TRUNCATE "transactional_outbox";
 
 DROP TABLE IF EXISTS "user";
 DROP SEQUENCE IF EXISTS user_id_seq;
-CREATE SEQUENCE user_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 3 CACHE 1;
+CREATE SEQUENCE user_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."user" (
     "id" integer DEFAULT nextval('user_id_seq') NOT NULL,
@@ -44,12 +48,12 @@ CREATE TABLE "public"."user" (
 ) WITH (oids = false);
 
 TRUNCATE "user";
-INSERT INTO "user" ("id", "username", "name", "surname", "propic_path", "upload_time", "bio_id", "salt", "hash") VALUES
-(2,	'_linux_00_',	NULL,	NULL,	'ProfilePictures/221211_11h38m46s.jpeg',	1706094311,	NULL,	'8/9DAURNdAvJ8OnywvngOw==',	'xjh7LEFoAZFfVJpw88QhfNg0xAFhfTr8EkQckMUMGmg='),
-(1,	'manuel2001',	'Manuel',	'Di Agostino',	'ProfilePictures/1706095149.jpeg',	1706041700,	NULL,	'GE4i+JL/vfQlFINnO89QOw==',	'qe+hGBDro/rBJ+QdzYgZA1GTLt0R1g6PHbsdSYTwnYc=');
+INSERT INTO "user" ("username", "name", "surname", "propic_path", "upload_time", "bio_id", "salt", "hash") VALUES
+('manuel2001',	'Manuel',	'Di Agostino',	'ProfilePictures/1706095149.jpeg',	1706041700,	NULL,	'h5G/JhFQfS0eGy2UmjhN3Q==',	'Kp3Hnh9eIkhmIZfp5sJSXJ9qWiOGwcWdiq5kQ8j17LI='),
+('_linux_00_',	NULL,	NULL,	'ProfilePictures/221211_11h38m46s.jpeg',	1706094311,	NULL,	'8/9DAURNdAvJ8OnywvngOw==',	'xjh7LEFoAZFfVJpw88QhfNg0xAFhfTr8EkQckMUMGmg=');
 
 ALTER TABLE ONLY "public"."bio" ADD CONSTRAINT "bio_id_user_fkey" FOREIGN KEY (user_id) REFERENCES "user"(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."user" ADD CONSTRAINT "user_id_bio_fkey" FOREIGN KEY (bio_id) REFERENCES bio(id) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE;
 
--- 2024-01-24 11:20:00.378792+00
+-- 2024-01-29 14:44:19.359308+00

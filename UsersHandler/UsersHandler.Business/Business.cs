@@ -12,7 +12,7 @@ using GlobalUtility.Kafka.Factory;
 using UsersHandler.Business.Kafka;
 
 namespace UsersHandler.Business;
-
+using UserOutType = UserTransactionalDto;
 public class Business : IBusiness {
 	private readonly IRepository _repository;
 	private readonly ILogger _logger;
@@ -41,22 +41,35 @@ public class Business : IBusiness {
 
 		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<UserTransactionalDto>(newUser, KafkaTopicsOutput.Users), cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
+
+		userDto.Password = "***";
 		_logger.LogInformation($"Added <{changes}> users for userDto <{JsonConvert.SerializeObject(userDto)}>");
 		return changes;
 	}
 
-	public async Task<User> GetUserFromId(int userId, CancellationToken cancellationToken = default) {
+	private UserOutType BuildUserOut(User user) {
+		UserOutType result = new UserOutType {
+			UserId = user.Id,
+			Username = user.Username,
+			Name = user.Name,
+			Surname = user.Surname
+		};
+
+		return result;
+	}
+
+	public async Task<UserOutType> GetUserFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
-		return await _repository.GetUserFromId(userId, cancellationToken);
+		return BuildUserOut(await _repository.GetUserFromId(userId, cancellationToken));
 	}
 
-	public async Task<User> GetUserFromUsername(string username, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> GetUserFromUsername(string username, CancellationToken cancellationToken = default) {
 		if (string.IsNullOrWhiteSpace(username))
 			throw new BusinessException("string.IsNullOrWhiteSpace(username)", nameof(username));
 
-		return await _repository.GetUserFromUsername(username, cancellationToken);
+		return BuildUserOut(await _repository.GetUserFromUsername(username, cancellationToken));
 	}
 
 	public async Task<int> GetIdFromUsername(string username, CancellationToken cancellationToken = default) {
@@ -66,7 +79,7 @@ public class Business : IBusiness {
 		return await _repository.GetIdFromUsername(username, cancellationToken);
 	}
 
-	public async Task<User> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 		if (string.IsNullOrWhiteSpace(username))
@@ -76,10 +89,10 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		_logger.LogInformation($"Updated user <{user.Id},{user.Username}> with username <{username}> ");
-		return user;
+		return BuildUserOut(user);
 	}
 
-	public async Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> DeleteUser(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
@@ -87,7 +100,7 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		_logger.LogInformation($"User <{userId}, {user.Username}> deleted");
-		return user;
+		return BuildUserOut(user);
 	}
 
 
@@ -108,7 +121,7 @@ public class Business : IBusiness {
 		return await GetProfilePictureFromId(id, cancellationToken);
 	}
 
-	public async Task<User> UploadProfilePictureFromId(int userId, IFormFile profilePicture, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> UploadProfilePictureFromId(int userId, IFormFile profilePicture, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 		if (profilePicture == null)
@@ -123,10 +136,10 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		_logger.LogInformation($"Profile picture for id <{userId}> saved to <{Files.GetAbsolutePath(relativePath)}>");
-		return res;
+		return BuildUserOut(res);
 	}
 
-	public async Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> DeleteImage(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
@@ -134,10 +147,10 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Profile picture for id <{userId}> deleted");
 
-		return user;
+		return BuildUserOut(user);
 	}
 
-	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
 			throw new BusinessException("bioDto == null", nameof(BioDto));
 
@@ -145,10 +158,10 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Created bio for user <{user.Id},{user.Username}>");
 
-		return user;
+		return BuildUserOut(user);
 	}
 
-	public async Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
 			throw new BusinessException("bioDto == null", nameof(BioDto));
 
@@ -156,7 +169,7 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Set bio for user <{user.Id},{user.Username}>");
 
-		return user;
+		return BuildUserOut(user);
 	}
 
 	public async Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default) {
@@ -169,7 +182,7 @@ public class Business : IBusiness {
 		return bio;
 	}
 
-	public async Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default) {
+	public async Task<UserOutType> DeleteBioFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
@@ -177,6 +190,32 @@ public class Business : IBusiness {
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Deleted bio for user id <{user.Id},{user.Username}>");
 
-		return user;
+		return BuildUserOut(user);
+	}
+
+	public async Task<bool> VerifyPassword(int userId, string password, CancellationToken cancellationToken = default) {
+		if (userId <= 0)
+			throw new BusinessException("userId <= 0", nameof(userId));
+		if (string.IsNullOrWhiteSpace(password))
+			throw new BusinessException("IsNullOrWhiteSpace(password)", nameof(password));
+
+		User user = await _repository.GetUserFromId(userId, cancellationToken);
+		return PasswordHasher.VerifyPassword(password, user.Hash, user.Salt);
+	}
+
+	public async Task<UserOutType> UpdatePassword(int userId, string oldPassword, string newPassword, CancellationToken cancellationToken = default) {
+		if (userId <= 0)
+			throw new BusinessException("userId <= 0", nameof(userId));
+		if (string.IsNullOrWhiteSpace(oldPassword))
+			throw new BusinessException("IsNullOrWhiteSpace(password)", nameof(oldPassword));
+		if (string.IsNullOrWhiteSpace(newPassword))
+			throw new BusinessException("IsNullOrWhiteSpace(password)", nameof(newPassword));
+		
+		User user = await _repository.GetUserFromId(userId, cancellationToken);
+		if (!PasswordHasher.VerifyPassword(oldPassword, user.Hash, user.Salt))
+			throw new BusinessException("Wrong password inserted", nameof(newPassword));
+
+		user = await _repository.UpdatePassword(userId, newPassword, cancellationToken);
+		return BuildUserOut(user);
 	}
 }

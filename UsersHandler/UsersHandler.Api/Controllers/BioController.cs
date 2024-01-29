@@ -2,12 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using UsersHandler.Business.Abstraction;
 using UsersHandler.Repository.Model;
 using UsersHandler.Shared;
-
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+
+using UserOutType = UsersHandler.Shared.UserTransactionalDto;
 
 namespace UsersHandler.Api.Controllers;
 
@@ -26,8 +23,8 @@ public class BioController : ControllerBase {
 	public async Task<ActionResult> CreateBio([FromQuery] BioDto bioDto) {
 		try {
 
-			User user = await _business.CreateBioFromId(bioDto);
-			return Ok($"Bio added for user <{user.Id},{user.Username}>");
+			UserOutType user = await _business.CreateBioFromId(bioDto);
+			return Ok($"Bio added for user <{user.UserId},{user.Username}>");
 
 		} catch (Exception e) {
 			return BadRequest($"{e.Message}");
@@ -38,8 +35,8 @@ public class BioController : ControllerBase {
 	public async Task<ActionResult> SetBioFromId([FromQuery] BioDto bioDto) {
 		try {
 
-			User user = await _business.SetBioFromId(bioDto);
-			return Ok($"Updated user <{user.Id},{user.Username}> with bio <{JsonConvert.SerializeObject(bioDto)}>");
+			UserOutType user = await _business.SetBioFromId(bioDto);
+			return Ok($"Updated user <{user.UserId},{user.Username}> with bio <{JsonConvert.SerializeObject(bioDto)}>");
 
 		} catch (Exception e) {
 			return BadRequest($"{e.Message}");
@@ -67,8 +64,8 @@ public class BioController : ControllerBase {
 	public async Task<ActionResult> DeleteBioFromId([FromQuery] int userId) {
 		try {
 
-			User user = await _business.DeleteBioFromId(userId);
-			return Ok($"Deleted bio for user <{user.Id},{user.Username}>");
+			UserOutType user = await _business.DeleteBioFromId(userId);
+			return Ok($"Deleted bio for user <{user.UserId},{user.Username}>");
 
 		} catch (Exception e) {
 			return BadRequest($"{e.Message}");
