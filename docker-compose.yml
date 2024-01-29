@@ -82,6 +82,8 @@ services:
             dockerfile: UsersHandler/UsersHandler.Api/Dockerfile
         ports:
             - 5001:5134
+        volumes:
+            - ./UsersHandler/UsersHandler.Api/ProfilePictures:/app/ProfilePictures
 
      # Spartiti
     scores_dbms:
@@ -108,3 +110,5 @@ services:
             dockerfile: MusicalScoresHandler/MusicalScoresHandler.Api/Dockerfile
         ports:
             - 5002:5134
+        volumes:
+            - ./MusicalScoresHandler/MusicalScoresHandler.Api/PdfScores:/app/PdfScores
