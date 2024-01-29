@@ -5,6 +5,6 @@ using System.Threading.Tasks;
 
 namespace GlobalUtility.Kafka.Abstraction.MessageHandler {
 	public interface IMessageHandler {
-		Task OnMessageReceivedAsync(string msg);
+		Task OnMessageReceivedAsync(string msg, CancellationToken cancellationToken = default);
 	}
 }

@@ -54,7 +54,7 @@ public class ProducerClient : IProducerClient {
                 deliveryResult = await _producer.ProduceAsync(topicPartition, msg, cancellationToken);
 
             } else {
-                _logger.LogInformation("Sending message: {msg}; towards the TopicPartition: '{topic}'", JsonSerializer.Serialize(msg), topic);
+                _logger.LogInformation("Sending message: {msg}; towards the Topic: '{topic}'", JsonSerializer.Serialize(msg), topic);
                 deliveryResult = await _producer.ProduceAsync(topic, msg, cancellationToken);
             }
 

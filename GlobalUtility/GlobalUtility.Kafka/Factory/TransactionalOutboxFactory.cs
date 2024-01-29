@@ -9,6 +9,14 @@ namespace GlobalUtility.Kafka.Factory {
             return Create<TDto>(dto, tableName, Operations.Insert);
         }
 
+		public static TransactionalOutbox CreateUpdate<TDto>(TDto dto, string tableName) where TDto : class, new() {
+            return Create<TDto>(dto, tableName, Operations.Update);
+        }
+
+		public static TransactionalOutbox CreateDelete<TDto>(TDto dto, string tableName) where TDto : class, new() {
+            return Create<TDto>(dto, tableName, Operations.Delete);
+        }
+
         private static TransactionalOutbox Create<TDto>(TDto dto, string tableName, string operation) where TDto : class, new() {
             OperationMessage<TDto> opMsg = new OperationMessage<TDto>() {
                 Dto  = dto,

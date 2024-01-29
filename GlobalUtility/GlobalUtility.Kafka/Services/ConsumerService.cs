@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GlobalUtility.Kafka.Services {
-	public abstract class ConsumerService<TKafkaTopicsInput> : IConsumerService<TKafkaTopicsInput> where TKafkaTopicsInput : class, IKafkaTopics {
+	public class ConsumerService<TKafkaTopicsInput> : IConsumerService<TKafkaTopicsInput> where TKafkaTopicsInput : class, IKafkaTopics {
 		protected ILogger<ConsumerService<TKafkaTopicsInput>> Logger { get; }
 		protected IConsumerClient ConsumerClient { get; }
 		protected IAdministratorClient AdministratorClient { get; }
@@ -38,16 +38,14 @@ namespace GlobalUtility.Kafka.Services {
 			_disposedValue = false;
 		}
 
-		public override async Task StartAsync(CancellationToken cancellationToken) {
-			foreach (var topic in Topics) {
-				while (!AdministratorClient.TopicExists(topic)) {
-					await Task.Delay(100, cancellationToken);
-				};
-			}
-		}
-
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
 			Logger.LogInformation("START ConsumerService.ExecuteAsync...");
+
+			foreach (var topic in Topics) {
+				while (!AdministratorClient.TopicExists(topic)) {
+					await Task.Delay(100, stoppingToken);
+				};
+			}
 
 			await ConsumerClient.ConsumeInLoopAsync(
 				Topics,
