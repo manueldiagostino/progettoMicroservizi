@@ -118,7 +118,7 @@ namespace AuthorsHandler.Repository {
 		public async Task DeleteTransactionalOutboxFromId(int id, CancellationToken cancellationToken = default) {
 			var res = _dbContext.TransactionalOutboxes.Where(x => x.id == id).ToList();
 			if (res.Count <= 0)
-				throw new ThreadStateException("res.Count() <= 0");
+				throw new RepositoryException("res.Count() <= 0");
 
 			_dbContext.Remove(res[0]);
 			await Task.CompletedTask;

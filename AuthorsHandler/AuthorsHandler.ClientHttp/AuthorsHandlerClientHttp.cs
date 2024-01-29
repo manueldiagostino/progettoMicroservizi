@@ -3,7 +3,6 @@ using AuthorsHandler.ClientHttp.Abstraction;
 namespace AuthorsHandler.ClientHttp;
 
 public class AuthorsHandlerClientHttp : IAuthorsHandlerClientHttp {
-
 	private readonly HttpClient _httpClient;
 	public AuthorsHandlerClientHttp(HttpClient httpClient) {
 		_httpClient = httpClient;

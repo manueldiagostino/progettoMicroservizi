@@ -11,7 +11,6 @@ namespace AuthorsHandler.Repository {
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
-			// modelBuilder.Ignore<TransactionalOutbox>();
 
 			modelBuilder.Entity<Author>().ToTable("author");
 			modelBuilder.Entity<Author>().HasKey(x => x.id);
