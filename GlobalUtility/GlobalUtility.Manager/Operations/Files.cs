@@ -54,9 +54,9 @@ public class Files {
 		}
 	}
 
-	public static string? GetAbsolutePath(string relativePath) {
+	public static string GetAbsolutePath(string relativePath) {
 		if (string.IsNullOrWhiteSpace(relativePath))
-			return null;
+			throw new ArgumentException("GetAbsolutePath: string.IsNullOrWhiteSpace(relativePath)");
 
 		string absolutePath = Path.GetFullPath(relativePath);
 
