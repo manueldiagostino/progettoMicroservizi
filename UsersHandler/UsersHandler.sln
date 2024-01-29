@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersHandler.Business", "Us
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersHandler.Shared", "UsersHandler.Shared\UsersHandler.Shared.csproj", "{00B8FEC0-F579-4887-ACD1-9F08AA1C90FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersHandler.ClientHttp", "UsersHandler.ClientHttp\UsersHandler.ClientHttp.csproj", "{168FA3FF-E7BA-4710-B74F-76BFE988B314}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{00B8FEC0-F579-4887-ACD1-9F08AA1C90FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00B8FEC0-F579-4887-ACD1-9F08AA1C90FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00B8FEC0-F579-4887-ACD1-9F08AA1C90FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{168FA3FF-E7BA-4710-B74F-76BFE988B314}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{168FA3FF-E7BA-4710-B74F-76BFE988B314}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{168FA3FF-E7BA-4710-B74F-76BFE988B314}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{168FA3FF-E7BA-4710-B74F-76BFE988B314}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

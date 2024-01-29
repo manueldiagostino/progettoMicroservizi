@@ -6,6 +6,7 @@ using UsersHandler.Repository.Abstraction;
 using UsersHandler.Business.Abstraction;
 using GlobalUtility.Manager;
 using Microsoft.OpenApi.Models;
+using UsersHandler.Business.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,10 @@ builder.Services.AddDbContext<UsersHandlerDbContext>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IBusiness, Business>();
 
+builder.Services.AddKafkaAdministratorService<KafkaTopicsOutput>(builder.Configuration);
+Console.WriteLine("executed AddKafkaAdministratorService");
+builder.Services.AddKafkaProducerService<KafkaTopicsOutput, ProducerService>(builder.Configuration);
+Console.WriteLine("executed AddKafkaProducerService");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -8,6 +8,8 @@ using UsersHandler.Shared;
 using GlobalUtility.Manager.Exceptions;
 using GlobalUtility.Manager.Operations;
 using Newtonsoft.Json;
+using GlobalUtility.Kafka.Factory;
+using UsersHandler.Business.Kafka;
 
 namespace UsersHandler.Business;
 
@@ -20,13 +22,25 @@ public class Business : IBusiness {
 		_logger = logger;
 	}
 
-	public async Task<int?> CreateUser(UserDto userDto, CancellationToken cancellationToken = default) {
+	public async Task<int> CreateUser(UserDto userDto, CancellationToken cancellationToken = default) {
 		if (userDto == null)
 			throw new BusinessException("userDto == null", nameof(userDto));
 
 		await _repository.CreateUser(userDto, cancellationToken = default);
-		int? changes = await _repository.SaveChangesAsync(cancellationToken);
+		int changes = await _repository.SaveChangesAsync(cancellationToken);
 
+		if (changes < 0)
+			throw new BusinessException("changes < 0");
+
+		var newUser = new UserTransactionalDto() {
+			UserId = await _repository.GetIdFromUsername(userDto.Username, cancellationToken),
+			Username = userDto.Username,
+			Name = userDto.Name,
+			Surname = userDto.Surname
+		};
+
+		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<UserTransactionalDto>(newUser, KafkaTopicsOutput.Users), cancellationToken);
+		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Added <{changes}> users for userDto <{JsonConvert.SerializeObject(userDto)}>");
 		return changes;
 	}
@@ -77,16 +91,19 @@ public class Business : IBusiness {
 	}
 
 
-	public async Task<string?> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default) {
+	public async Task<string> GetProfilePictureFromId(int userId, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
 		string? relativePath = await _repository.GetProfilePictureFromId(userId, cancellationToken);
 
+		if (relativePath == null)
+			throw new BusinessException("GetProfilePictureFromId: relativePath == null");
+
 		return Files.GetAbsolutePath(relativePath);
 	}
 
-	public async Task<string?> GetProfilePictureFromUsername(string username, CancellationToken cancellationToken = default) {
+	public async Task<string> GetProfilePictureFromUsername(string username, CancellationToken cancellationToken = default) {
 		int id = await GetIdFromUsername(username, cancellationToken);
 		return await GetProfilePictureFromId(id, cancellationToken);
 	}
@@ -123,7 +140,7 @@ public class Business : IBusiness {
 	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
 			throw new BusinessException("bioDto == null", nameof(BioDto));
-		
+
 		User user = await _repository.CreateBioFromId(bioDto, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Created bio for user <{user.Id},{user.Username}>");
@@ -134,7 +151,7 @@ public class Business : IBusiness {
 	public async Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
 		if (bioDto == null)
 			throw new BusinessException("bioDto == null", nameof(BioDto));
-		
+
 		User user = await _repository.SetBioFromId(bioDto, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 		_logger.LogInformation($"Set bio for user <{user.Id},{user.Username}>");

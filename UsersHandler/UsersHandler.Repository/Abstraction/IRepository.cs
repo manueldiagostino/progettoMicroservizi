@@ -1,6 +1,7 @@
 using UsersHandler.Repository.Model;
 using SixLabors.ImageSharp;
 using UsersHandler.Shared;
+using GlobalUtility.Kafka.Model;
 
 namespace UsersHandler.Repository.Abstraction;
 
@@ -23,7 +24,12 @@ public interface IRepository {
 
 	// Operazioni CRUD per Bio
 	public Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default);
-	Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default); 
-	Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default); 
-	Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default); 
+	Task<User> SetBioFromId(BioDto bioDto, CancellationToken cancellationToken = default);
+	Task<string?> GetBioFromId(int userId, CancellationToken cancellationToken = default);
+	Task<User> DeleteBioFromId(int userId, CancellationToken cancellationToken = default);
+
+	// TransactionalOutbox per Kafka
+	public Task InsertTransactionalOutbox(TransactionalOutbox transactionalOutbox, CancellationToken cancellationToken = default);
+	public Task DeleteTransactionalOutboxFromId(int id, CancellationToken cancellationToken = default);
+	public Task<IEnumerable<TransactionalOutbox>> GetAllTransactionalOutboxes(CancellationToken ct = default);
 }

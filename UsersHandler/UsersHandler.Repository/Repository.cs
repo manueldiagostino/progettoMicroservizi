@@ -8,6 +8,7 @@ using GlobalUtility.Manager.Exceptions;
 using GlobalUtility.Manager.Operations;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using GlobalUtility.Kafka.Model;
 
 namespace UsersHandler.Repository;
 
@@ -245,7 +246,7 @@ public class Repository : IRepository {
 		List<Bio> bioList = await queryableBio.ToListAsync(cancellationToken: cancellationToken);
 		if (bioList.Count != 1)
 			throw new RepositoryException($"Found <{bioList.Count}> bio for id <{userId}>");
-		
+
 		_dbContext.Remove(bioList[0]);
 
 		var queryableUser = _dbContext.Users
@@ -264,5 +265,21 @@ public class Repository : IRepository {
 			, cancellationToken);
 
 		return user;
+	}
+
+	public async Task<IEnumerable<TransactionalOutbox>> GetAllTransactionalOutboxes(CancellationToken ct = default) {
+		return await _dbContext.TransactionalOutboxes.ToListAsync(cancellationToken: ct);
+	}
+
+	public async Task InsertTransactionalOutbox(TransactionalOutbox transactionalOutbox, CancellationToken cancellationToken = default) {
+		await _dbContext.AddAsync(transactionalOutbox, cancellationToken);
+	}
+	public async Task DeleteTransactionalOutboxFromId(int id, CancellationToken cancellationToken = default) {
+		var res = _dbContext.TransactionalOutboxes.Where(x => x.id == id).ToList();
+		if (res.Count <= 0)
+			throw new RepositoryException("res.Count() <= 0");
+
+		_dbContext.Remove(res[0]);
+		await Task.CompletedTask;
 	}
 }
