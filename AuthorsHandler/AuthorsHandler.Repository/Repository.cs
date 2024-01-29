@@ -1,21 +1,54 @@
 using AuthorsHandler.Repository.Abstraction;
 using AuthorsHandler.Repository.Model;
 using GlobalUtility.Kafka.Model;
+using GlobalUtility.Manager.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace AuthorsHandler.Repository {
 	public class Repository : IRepository {
-		protected AuthorsHandlerDbContext authorsHandlerDbContext_;
+		protected AuthorsHandlerDbContext _dbContext;
 
 		public Repository(AuthorsHandlerDbContext authorsHandlerDbContext) {
-			authorsHandlerDbContext_ = authorsHandlerDbContext;
+			_dbContext = authorsHandlerDbContext;
+		}
+
+		private IQueryable<Author> GetQueryable(int id) {
+			return _dbContext.Authors
+				.Where(x => x.id == id);
+		}
+
+		private IQueryable<Author> GetQueryable(string name, string surname) {
+			return _dbContext.Authors.Where(x =>
+				x.name.ToLower().Equals(name.ToLower()) &&
+				x.surname.ToLower().Equals(surname.ToLower())
+			);
+		}
+
+		private async Task<Author> GetUnique(int id, CancellationToken cancellationToken = default) {
+			var queryable = GetQueryable(id);
+
+			List<Author> authorList = await queryable.ToListAsync(cancellationToken: cancellationToken);
+			if (authorList.Count != 1)
+				throw new RepositoryException($"Found <{authorList.Count}> genres for id <{id}>");
+
+			return authorList[0];
+		}
+
+		private async Task<Author> GetUnique(string name, string surname, CancellationToken cancellationToken = default) {
+			var queryable = GetQueryable(name, surname);
+
+			List<Author> authorList = await queryable.ToListAsync(cancellationToken: cancellationToken);
+			if (authorList.Count != 1)
+				throw new RepositoryException($"Found <{authorList.Count}> author for <{surname} {name}>");
+
+			return authorList[0];
 		}
 
 		public int SaveChanges() {
 			int result = -1;
 			try {
-				result = authorsHandlerDbContext_.SaveChanges();
+				result = _dbContext.SaveChanges();
 			} catch (Exception e) {
 				System.Console.WriteLine(e.Message);
 				result = 0;
@@ -25,7 +58,7 @@ namespace AuthorsHandler.Repository {
 		}
 
 		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) {
-			return await authorsHandlerDbContext_.SaveChangesAsync(cancellationToken);
+			return await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		public async Task CreateAuthor(string name, string surname, CancellationToken ct) {
@@ -34,24 +67,18 @@ namespace AuthorsHandler.Repository {
 				surname = surname
 			};
 
-			await authorsHandlerDbContext_.AddAsync(author, ct);
+			await _dbContext.AddAsync(author, ct);
 		}
 
-		public async Task<int?> GetAuthorIdFromName(string name, string surname, CancellationToken ct) {
-			var res = await authorsHandlerDbContext_.Authors
-				.Where(n => n.name.ToLower().Equals(name.ToLower()))
-				.ToListAsync(ct);
-
-			return (res.Count != 1) ? null : res[0].id;
+		public async Task<int> GetAuthorIdFromName(string name, string surname, CancellationToken ct) {
+			return (await GetUnique(name, surname, ct)).id;
 		}
 
 
-		public async Task<ICollection<string>?> GetExternalLinksForAuthor(string name, string surname, CancellationToken ct) {
-			var id = await GetAuthorIdFromName(name, surname, ct);
-			if (id == null)
-				return null;
+		public async Task<ICollection<string>> GetExternalLinksForAuthor(string name, string surname, CancellationToken ct) {
+			var id = await GetUnique(name, surname, ct);
 
-			var res = await authorsHandlerDbContext_.ExternalLinks
+			var res = await _dbContext.ExternalLinks
 				.Where(l => l.authorId.Equals(id))
 				.ToListAsync(ct);
 
@@ -62,51 +89,38 @@ namespace AuthorsHandler.Repository {
 			return urls;
 		}
 
-		private async Task<Author?> GetAuthorFromId(int id, CancellationToken ct) {
-			var res = await authorsHandlerDbContext_.Authors
-				.Where(a => a.id == id)
-				.ToListAsync(ct);
+		public async Task<Author> RemoveAuthor(string name, string surname, CancellationToken ct = default) {
+			var author = await GetUnique(name, surname, ct);
+			_dbContext.Authors.Remove(author);
 
-			return (res.Count == 0) ? null : res[0];
-		}
-
-		public async Task<Author?> RemoveAuthor(string name, string surname, CancellationToken ct = default) {
-			var id_res = await GetAuthorIdFromName(name, surname, ct);
-			if (id_res == null)
-				return null;
-
-			int id_not_null = (int)(id_res);
-
-			Author? author = await GetAuthorFromId(id_not_null, ct);
-			if (author == null)
-				return null;
-
-			authorsHandlerDbContext_.Authors.Remove(author);
 			return author;
 		}
 
-		public async Task<int?> UpdateAuthor(string name, string surname, string newName, string newSurname, CancellationToken ct = default) {
-			return await authorsHandlerDbContext_.Authors
-				.Where(a => a.name.Equals(name) && a.surname.Equals(surname))
-				.ExecuteUpdateAsync(a => a
-					.SetProperty(n => n.name, newName)
-					.SetProperty(s => s.surname, newSurname)
-				, ct);
+		public async Task<Author> UpdateAuthor(string name, string surname, string newName, string newSurname, CancellationToken ct = default) {
+			var queryable = GetQueryable(name, surname);
+			var author = await GetUnique(name, surname, ct);
+
+			await queryable.ExecuteUpdateAsync(a => a
+				.SetProperty(n => n.name, newName)
+				.SetProperty(s => s.surname, newSurname)
+			, ct);
+
+			return author;
 		}
 
 		public async Task<IEnumerable<TransactionalOutbox>> GetAllTransactionalOutboxes(CancellationToken ct = default) {
-			return await authorsHandlerDbContext_.TransactionalOutboxes.ToListAsync(cancellationToken: ct);
+			return await _dbContext.TransactionalOutboxes.ToListAsync(cancellationToken: ct);
 		}
 
 		public async Task InsertTransactionalOutbox(TransactionalOutbox transactionalOutbox, CancellationToken cancellationToken = default) {
-			await authorsHandlerDbContext_.AddAsync(transactionalOutbox, cancellationToken);
+			await _dbContext.AddAsync(transactionalOutbox, cancellationToken);
 		}
 		public async Task DeleteTransactionalOutboxFromId(int id, CancellationToken cancellationToken = default) {
-			var res = authorsHandlerDbContext_.TransactionalOutboxes.Where(x => x.id == id).ToList();
+			var res = _dbContext.TransactionalOutboxes.Where(x => x.id == id).ToList();
 			if (res.Count <= 0)
 				throw new ThreadStateException("res.Count() <= 0");
 
-			authorsHandlerDbContext_.Remove(res[0]);
+			_dbContext.Remove(res[0]);
 			await Task.CompletedTask;
 		}
 
@@ -121,61 +135,67 @@ namespace AuthorsHandler.Repository {
 				// Crea un nuovo UriBuilder per costruire l'URL sanificato
 				UriBuilder uriBuilder = new UriBuilder(uri);
 
-				// Rimuovi il frammento (parte dopo #) se presente
+				// Rimuove il frammento (parte dopo #) se presente
 				uriBuilder.Fragment = string.Empty;
 
-				// Rimuovi le query string se presente
+				// Rimuove le query string se presente
 				uriBuilder.Query = string.Empty;
 
 				// Codifica i caratteri non validi nell'URL
 				uriBuilder.Path = Uri.EscapeDataString(uriBuilder.Path);
 
-				// Costruisci e restituisci l'URL sanificato come stringa
+				// Costruisce e restituisce l'URL sanificato come stringa
 				return uriBuilder.Uri.ToString();
 			} catch (UriFormatException) {
-				// Gestisci il caso in cui l'URL originale non è valido
 				return string.Empty;
 			}
 		}
 
-		public async Task<ExternalLink?> InsertExternalLinkForAuthor(string name, string surname, string url, CancellationToken ct) {
+		public async Task<ExternalLink> InsertExternalLinkForAuthor(string name, string surname, string url, CancellationToken ct) {
 			ExternalLink target = new() {
-				authorId = await GetAuthorIdFromName(name, surname, ct) ?? throw new ThreadStateException("GetAuthorIdFromName() returned not valid id"),
+				authorId = (await GetUnique(name, surname, ct)).id,
 				url = Repository.SanitizeUrl(url)
 			};
 
-			await authorsHandlerDbContext_.AddAsync(target, ct);
+			await _dbContext.AddAsync(target, ct);
 			return target;
 		}
 
-		public async Task<int?> UpdateExternalLinkForAuthor(string name, string surname, string url, CancellationToken ct = default) {
-			int? id = await GetAuthorIdFromName(name, surname, ct);
+		public async Task<ExternalLink> UpdateExternalLinkForAuthor(string name, string surname, int linkId, string newUrl, CancellationToken ct = default) {
+			int id = (await GetUnique(name, surname, ct)).id;
 
-			if (id <= 0)
-				return null;
-			
-			return await authorsHandlerDbContext_.ExternalLinks
-				.Where(e => e.authorId==id)
-				.ExecuteUpdateAsync( e =>
-					e.SetProperty(x => x.url, url)
-			);
+			await _dbContext.ExternalLinks
+				.Where(e => e.authorId == id && e.id == linkId)
+				.ExecuteUpdateAsync(e =>
+					e.SetProperty(x => x.url, newUrl)
+			, ct);
+
+			var res = await _dbContext.ExternalLinks
+				.Where(e => e.authorId == id)
+				.ToListAsync(ct);
+
+			if (res.Count != 1)
+				throw new RepositoryException($"Found <{res.Count}> links for author <{surname} {name}>");
+
+			return res[0];
 		}
 
-		public async Task<ExternalLink?> RemoveExternalLinkForAuthor(string name, string surname, string url, CancellationToken ct = default) {
-			int? id = await GetAuthorIdFromName(name, surname, ct);
+		public async Task<ExternalLink> RemoveExternalLinkForAuthor(string name, string surname, int linkId, CancellationToken ct = default) {
+			int id = (await GetUnique(name, surname, ct)).id;
 
-			if (id <= 0)
-				return null;
+			List<ExternalLink>? res = await _dbContext.ExternalLinks
+				.Where(e => e.authorId == id && e.id == linkId)
+				.ToListAsync(ct);
 
-			List<ExternalLink>? res = await authorsHandlerDbContext_.ExternalLinks
-				.Where(e => e.authorId==id && e.url.Equals(url))
-				.ToListAsync();
+			if (res.Count != 1)
+				throw new RepositoryException($"Found <{res.Count}> links for author <{surname} {name}>");
 
-			if (res.Count <= 0)
-				return null;
-
-			authorsHandlerDbContext_.Remove(res[0]);
+			_dbContext.Remove(res[0]);
 			return res[0];
+		}
+
+		public async Task<Author> GetAuthorFromId(int authorId, CancellationToken ct) {
+			return await GetUnique(authorId, ct);
 		}
 	}
 }

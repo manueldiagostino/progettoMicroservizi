@@ -28,10 +28,11 @@ namespace AuthorsHandler.Business {
 				await repository_.CreateAuthor(authorDto.name, authorDto.surname, ct);
 				createdCount = await repository_.SaveChangesAsync(ct);
 
-				// var authorReadDto = mapper_.Map<AuthorReadDto>(authorDto);
+				if (createdCount != 1)
+					return false;
 
 				var newAuthor = new AuthorTransactionalDto() {
-					id = await repository_.GetAuthorIdFromName(authorDto.name, authorDto.surname, ct) ?? -1,
+					id = await repository_.GetAuthorIdFromName(authorDto.name, authorDto.surname, ct),
 					name = authorDto.name,
 					surname = authorDto.surname
 				};
@@ -45,14 +46,14 @@ namespace AuthorsHandler.Business {
 			return createdCount == 1;
 		}
 
-		public async Task<Author?> RemoveAuthor(AuthorDto author, CancellationToken ct = default) {
+		public async Task<Author> RemoveAuthor(AuthorDto author, CancellationToken ct = default) {
 			var res = await repository_.RemoveAuthor(author.name, author.surname, ct);
 			await repository_.SaveChangesAsync(ct);
 
 			return res;
 		}
 
-		public async Task<int?> GetAuthorIdFromName(string name, string surname, CancellationToken ct) {
+		public async Task<int> GetAuthorIdFromName(string name, string surname, CancellationToken ct) {
 			return await repository_.GetAuthorIdFromName(name, surname, ct); ;
 		}
 
@@ -60,53 +61,36 @@ namespace AuthorsHandler.Business {
 			return await repository_.GetExternalLinksForAuthor(name, surname, ct); ;
 		}
 
-		public async Task<int?> UpdateAuthor(AuthorDto oldAuthor, AuthorDto newAuthor, CancellationToken ct = default) {
+		public async Task<Author> UpdateAuthor(AuthorDto oldAuthor, AuthorDto newAuthor, CancellationToken ct = default) {
 			var res = await repository_.UpdateAuthor(oldAuthor.name, oldAuthor.surname, newAuthor.name, newAuthor.surname, ct);
 			await repository_.SaveChangesAsync(ct);
 
 			return res;
 		}
 
-		public async Task<ExternalLink?> InsertExternalLinkForAuthor(AuthorDto authorDto, string url, CancellationToken ct) {
-			ExternalLink? res = null;
-
-			try {
-				res = await repository_.InsertExternalLinkForAuthor(authorDto.name, authorDto.surname, url, ct);
-				await repository_.SaveChangesAsync(ct);
-
-			} catch (Exception) {
-				return null;
-			}
+		public async Task<ExternalLink> InsertExternalLinkForAuthor(AuthorDto authorDto, string url, CancellationToken ct) {
+			var res = await repository_.InsertExternalLinkForAuthor(authorDto.name, authorDto.surname, url, ct);
+			await repository_.SaveChangesAsync(ct);
 
 			return res;
 		}
 
-		public async Task<int?> UpdateExternalLinkForAuthor(AuthorDto authorDto, string url, CancellationToken ct = default) {
-			int? res = null;
-
-			try {
-				res = await repository_.UpdateExternalLinkForAuthor(authorDto.name, authorDto.surname, url, ct);
-				await repository_.SaveChangesAsync(ct);
-
-			} catch (Exception) {
-				return null;
-			}
+		public async Task<ExternalLink> UpdateExternalLinkForAuthor(AuthorDto authorDto, int linkId, string newUrl, CancellationToken ct = default) {
+			var res = await repository_.UpdateExternalLinkForAuthor(authorDto.name, authorDto.surname,linkId, newUrl, ct);
+			await repository_.SaveChangesAsync(ct);
 
 			return res;
 		}
 
-		public async Task<ExternalLink?> RemoveExternalLinkForAuthor(AuthorDto authorDto, string url, CancellationToken ct = default) {
-			ExternalLink? res = null;
-
-			try {
-				res = await repository_.RemoveExternalLinkForAuthor(authorDto.name, authorDto.surname, url, ct);
-				await repository_.SaveChangesAsync(ct);
-
-			} catch (Exception) {
-				return null;
-			}
+		public async Task<ExternalLink> RemoveExternalLinkForAuthor(AuthorDto authorDto, int linkId, CancellationToken ct = default) {
+			var res = await repository_.RemoveExternalLinkForAuthor(authorDto.name, authorDto.surname, linkId, ct);
+			await repository_.SaveChangesAsync(ct);
 
 			return res;
+		}
+
+		public async Task<Author> GetAuthorFromId(int authorId, CancellationToken ct = default) {
+			return await repository_.GetAuthorFromId(authorId, ct);
 		}
 	}
 }
