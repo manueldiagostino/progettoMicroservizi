@@ -9,6 +9,7 @@ namespace AuthorsHandler.Repository.Abstraction {
 		public Task CreateAuthor(string name, string surname, CancellationToken ct = default);
 		public Task<int> GetAuthorIdFromName(string name, string surname, CancellationToken ct = default);
 		public Task<Author> GetAuthorFromId(int authorId, CancellationToken ct = default);
+		public Task<ICollection<Author>> GetAllAuthors(CancellationToken ct = default);
 
 		public Task<Author> UpdateAuthor(string name, string surname, string newName, string newSurname, CancellationToken ct = default);
 		public Task<Author> RemoveAuthor(string name, string surname, CancellationToken ct = default);

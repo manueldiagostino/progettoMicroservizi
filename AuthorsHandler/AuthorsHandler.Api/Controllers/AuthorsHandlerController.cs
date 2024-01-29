@@ -8,43 +8,41 @@ namespace AuthorsHandler.Controllers {
 	[ApiController]
 	[Route("[controller]/[action]")]
 	public class AuthorsHandlerController : ControllerBase {
-		private readonly IBusiness business_;
-		private readonly ILogger logger_;
+		private readonly IBusiness _business;
+		private readonly ILogger _logger;
 
 		public AuthorsHandlerController(IBusiness business, ILogger<AuthorsHandlerController> logger) {
-			business_ = business;
-			logger_ = logger;
+			_business = business;
+			_logger = logger;
 		}
 
 		[HttpPut(Name = "CreateAuthor")]
 		public async Task<IActionResult> CreateAuthor([FromQuery] AuthorDto authorDto) {
 
-			bool isCreated = await business_.CreateAuthor(authorDto);
-
-			if (isCreated)
-				return Ok("Author " + authorDto.name + " " + authorDto.surname + " added");
-			else
+			bool isCreated = await _business.CreateAuthor(authorDto);
+			if (!isCreated)
 				return BadRequest("The author already exists");
+
+			return Ok("Author " + authorDto.name + " " + authorDto.surname + " added");
 		}
 
 		[HttpDelete(Name = "RemoveAuthor")]
 		public async Task<IActionResult> DeleteAuthor([FromQuery] AuthorDto authorDto) {
-
-			Author? deletedAuthor = await business_.RemoveAuthor(authorDto);
-
-			if (deletedAuthor != null)
+			try {
+				Author deletedAuthor = await _business.RemoveAuthor(authorDto);
 				return Ok("Author " + deletedAuthor.name + " " + deletedAuthor.surname + " deleted");
-			else
-				return BadRequest("The author does not exist");
+			} catch (Exception e) {
+				return BadRequest($"The author {JsonSerializer.Serialize(authorDto)} does not exist");
+			}
 		}
 
 		[HttpPost(Name = "UpdateAuthor")]
-		public async Task<IActionResult> UpdateAuthor([FromQuery] UpdateAuthorDto update) { // cerca Query
+		public async Task<IActionResult> UpdateAuthor([FromQuery] UpdateAuthorDto update) {
 			AuthorDto oldAuthor = new AuthorDto { name = update.oldName, surname = update.oldSurname };
 			AuthorDto newAuthor = new AuthorDto { name = update.newName, surname = update.newSurname };
 
 			try {
-				var res = await business_.UpdateAuthor(oldAuthor, newAuthor);
+				var res = await _business.UpdateAuthor(oldAuthor, newAuthor);
 				return Ok($"User updated: {update}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
@@ -54,8 +52,18 @@ namespace AuthorsHandler.Controllers {
 		[HttpGet(Name = "GetAuthorIdFromName")]
 		public async Task<IActionResult> GetAuthorIdFromName(string name, string surname) {
 			try {
-				int res = await business_.GetAuthorIdFromName(name, surname);
+				int res = await _business.GetAuthorIdFromName(name, surname);
 				return Ok($"User id: {res}");
+			} catch (Exception e) {
+				return BadRequest($"{e.Message}");
+			}
+		}
+
+		[HttpGet(Name = "GetAllAuthors")]
+		public async Task<IActionResult> GetAllAuthors() {
+			try {
+				var res = await _business.GetAllAuthors();
+				return Ok($"{JsonSerializer.Serialize(res)}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
 			}
@@ -63,18 +71,19 @@ namespace AuthorsHandler.Controllers {
 
 		[HttpGet(Name = "GetExternalLinksForAuthor")]
 		public async Task<IActionResult> GetExternalLinksForAuthor(string name, string surname) {
-			ICollection<string>? res = await business_.GetExternalLinksForAuthor(name, surname);
+			try {
+				ICollection<string> res = await _business.GetExternalLinksForAuthor(name, surname);
+				return Ok(String.Join("\n", res));
+			} catch (Exception e) {
+				return NotFound($"{e.Message}");
 
-			if (res == null)
-				return NotFound("Author " + name + " " + surname + " not found");
-
-			return Ok("Author " + name + " " + surname + " has urls:\n" + String.Join("\n", res));
+			}
 		}
 
 		[HttpPut(Name = "InsertExternalLink")]
 		public async Task<IActionResult> InsertExternalLink([FromQuery] AuthorDto authorDto, string url) {
 			try {
-				ExternalLink? res = await business_.InsertExternalLinkForAuthor(authorDto, url);
+				ExternalLink res = await _business.InsertExternalLinkForAuthor(authorDto, url);
 				return Ok($"Inserted link: {res}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
@@ -84,7 +93,7 @@ namespace AuthorsHandler.Controllers {
 		[HttpPost(Name = "UpdateExternalLinkForAuthor")]
 		public async Task<IActionResult> UpdateExternalLinkForAuthor([FromQuery] AuthorDto authorDto, int linkId, string newUrl) {
 			try {
-				ExternalLink? res = await business_.UpdateExternalLinkForAuthor(authorDto, linkId, newUrl);
+				ExternalLink res = await _business.UpdateExternalLinkForAuthor(authorDto, linkId, newUrl);
 				return Ok($"Inserted link: {res}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
@@ -94,7 +103,7 @@ namespace AuthorsHandler.Controllers {
 		[HttpDelete(Name = "RemoveExternalLinkForAuthor")]
 		public async Task<IActionResult> RemoveExternalLinkForAuthor([FromQuery] AuthorDto authorDto, int linkId, string url) {
 			try {
-				ExternalLink? res = await business_.RemoveExternalLinkForAuthor(authorDto, linkId);
+				ExternalLink res = await _business.RemoveExternalLinkForAuthor(authorDto, linkId);
 				return Ok($"Inserted link: {res}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
@@ -104,7 +113,7 @@ namespace AuthorsHandler.Controllers {
 		[HttpGet(Name = "GetAuthorFromId")]
 		public async Task<IActionResult> GetAuthorFromId(int authorId) {
 			try {
-				Author author = await business_.GetAuthorFromId(authorId);
+				Author author = await _business.GetAuthorFromId(authorId);
 				return Ok($"{JsonSerializer.Serialize(author)}");
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");

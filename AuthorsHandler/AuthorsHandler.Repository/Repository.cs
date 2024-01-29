@@ -30,7 +30,7 @@ namespace AuthorsHandler.Repository {
 
 			List<Author> authorList = await queryable.ToListAsync(cancellationToken: cancellationToken);
 			if (authorList.Count != 1)
-				throw new RepositoryException($"Found <{authorList.Count}> genres for id <{id}>");
+				throw new RepositoryException($"Found <{authorList.Count}> authors for id <{id}>");
 
 			return authorList[0];
 		}
@@ -196,6 +196,10 @@ namespace AuthorsHandler.Repository {
 
 		public async Task<Author> GetAuthorFromId(int authorId, CancellationToken ct) {
 			return await GetUnique(authorId, ct);
+		}
+
+		public async Task<ICollection<Author>> GetAllAuthors(CancellationToken ct = default) {
+			return await _dbContext.Authors.ToListAsync(ct);
 		}
 	}
 }
