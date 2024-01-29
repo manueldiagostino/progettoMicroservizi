@@ -7,22 +7,31 @@ using MusicalScoresHandler.Business.Abstraction;
 using MusicalScoresHandler.Repository.Abstraction;
 using MusicalScoresHandler.Repository.Model;
 using MusicalScoresHandler.Shared;
+using System.Net.Http;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AuthorsHandler.ClientHttp.Abstraction;
 
 namespace MusicalScoresHandler.Business.Business {
 	public class Business : IBusiness {
 		private readonly ILogger _logger;
 		private readonly IRepository _repository;
 
+		private readonly IAuthorKafkaRepository _kafkaRepository;
+		private readonly IAuthorsHandlerClientHttp _clientHttp;
+
 		public Business(
 		ILogger<Business> logger,
-		IRepository repository) {
+		IRepository repository,
+		IAuthorKafkaRepository kafkaRepository,
+		IAuthorsHandlerClientHttp clientHttp) {
 
 			_logger = logger;
 			_repository = repository;
+			_kafkaRepository = kafkaRepository;
+			_clientHttp = clientHttp;
 		}
 
 		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) {
@@ -73,10 +82,43 @@ namespace MusicalScoresHandler.Business.Business {
 			return deletedGenre;
 		}
 
+		private async Task CheckWithHttp(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
+			_logger.LogInformation($"Failed checking musicalScoreDto.AuthorId from cache, trying with http...");
+			HttpResponseMessage response = await _clientHttp.GetAuthorFromId(musicalScoreDto.AuthorId, cancellationToken);
+
+			if (!response.IsSuccessStatusCode)
+				throw new BusinessException($"No such author for id <{musicalScoreDto.AuthorId}>");
+
+			string authorString = await response.Content.ReadAsStringAsync(cancellationToken);
+			_logger.LogInformation($"Response string <{authorString}>");
+
+			var deserializeOptions = new JsonSerializerOptions {
+				PropertyNameCaseInsensitive = true,
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
+
+			AuthorKafkaDto? authorDto = JsonSerializer.Deserialize<AuthorKafkaDto>(authorString, deserializeOptions);
+			_logger.LogInformation($"Deserialized AuthorKafkaDto <{JsonSerializer.Serialize(authorDto)}>");
+
+			AuthorKafka author = new() {
+				AuthorId = authorDto.AuthorId,
+				Name = authorDto.Name,
+				Surname = authorDto.Surname
+			};
+
+			await _kafkaRepository.InsertAuthor(author, cancellationToken);
+			await _kafkaRepository.SaveChangesAsync(cancellationToken);
+			_logger.LogInformation($"Saved AuthorKafka into DBMS");
+		}
+
 		// Operazioni CRUD per MusicalScore
 		public async Task CreateMusicalScore(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
 			if (musicalScoreDto == null)
 				throw new BusinessException("musicalScoreDto == null");
+
+			// Check validity of the autorId
+			if (!await _kafkaRepository.CheckAuthorId(musicalScoreDto.AuthorId))
+				await CheckWithHttp(musicalScoreDto, cancellationToken);
 
 			await _repository.CreateMusicalScore(musicalScoreDto, cancellationToken);
 			await SaveChangesAsync(cancellationToken);
@@ -170,11 +212,10 @@ namespace MusicalScoresHandler.Business.Business {
 				throw new BusinessException("pdfFileReadDto == null", nameof(pdfFileReadDto));
 			if (file == null)
 				throw new BusinessException("file == null", nameof(file));
+			if (!await _repository.CheckMusicalScoreId(pdfFileReadDto.MusicalScoreId, cancellationToken))
+				throw new BusinessException($"Error while creating new PdfFile: no such MusicalScore for id <{pdfFileReadDto.MusicalScoreId}>");
 
-			string? relativePath = Files.SaveFileToDir(Path.Combine("PdfScores"), file);
-
-			if (relativePath == null)
-				throw new BusinessException("SaveFileToDisk returned path == null");
+			string? relativePath = Files.SaveFileToDir(Path.Combine("PdfScores"), file) ?? throw new BusinessException("SaveFileToDisk returned path == null");
 
 			PdfFileDto pdfFileDto = new PdfFileDto {
 				MusicalScoreId = pdfFileReadDto.MusicalScoreId,
@@ -197,7 +238,7 @@ namespace MusicalScoresHandler.Business.Business {
 				throw new BusinessException("fileId <= 0", nameof(fileId));
 			if (file == null)
 				throw new BusinessException("file == null", nameof(file));
-			
+
 			string relativePath = Files.SaveFileToDir(Path.Combine("PdfScores"), file);
 			_logger.LogInformation($"File saved into <{relativePath}>");
 
@@ -239,6 +280,6 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 
-		
+
 	}
 }

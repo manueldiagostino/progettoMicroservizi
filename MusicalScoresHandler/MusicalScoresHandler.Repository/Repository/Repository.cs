@@ -132,5 +132,9 @@ namespace MusicalScoresHandler.Repository.Repository {
 		public async Task<PdfFile> UpdatePdfFile(int fileId, string newPath, CancellationToken cancellationToken = default) {
 			return await _pdfFilesRepository.UpdatePdfFile(fileId, newPath, cancellationToken);
 		}
+
+		public async Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default) {
+			return await _musicalScoresRepository.CheckMusicalScoreId(scoreId, cancellationToken);
+		}
 	}
 }

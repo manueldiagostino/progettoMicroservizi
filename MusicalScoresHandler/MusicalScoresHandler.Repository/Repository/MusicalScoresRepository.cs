@@ -92,4 +92,12 @@ public class MusicalScoresRepository : IMusicalScoresRepository {
 
 		return musicalScoreList[0];
 	}
+
+	public async Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default) {
+		try {
+			await GetUnique(scoreId, cancellationToken);
+			return true;
+		} catch { }
+		return false;
+	}
 }

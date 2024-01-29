@@ -11,6 +11,7 @@ public class MusicalScoresHandlerDbContext : DbContext {
 	public DbSet<PdfFile> PdfFiles { get; set; }
 	public DbSet<ScoreGenreRelationship> ScoreGenreRelationships { get; set; }
 	public DbSet<Copyright> Copyrights { get; set; }
+	public DbSet<AuthorKafka> AuthorsKafka { get; set; }
 	
 	public MusicalScoresHandlerDbContext(IConfiguration configuration) {
 		Configuration = configuration;
@@ -93,11 +94,19 @@ public class MusicalScoresHandlerDbContext : DbContext {
 
 		modelBuilder.Entity<Copyright>().Property(x => x.Id).HasColumnName("id");
 		modelBuilder.Entity<Copyright>().Property(x => x.Name).HasColumnName("name");
+
+
+		modelBuilder.Entity<AuthorKafka>().ToTable("author_kafka");
+		modelBuilder.Entity<AuthorKafka>().HasKey(x => x.Id);
+		modelBuilder.Entity<AuthorKafka>().Property(x => x.Id).HasColumnName("id");
+		modelBuilder.Entity<AuthorKafka>().Property(x => x.AuthorId).HasColumnName("author_id");
+		modelBuilder.Entity<AuthorKafka>().Property(x => x.Name).HasColumnName("name");
+		modelBuilder.Entity<AuthorKafka>().Property(x => x.Surname).HasColumnName("surname");
 		
 	}
 
 	protected override void OnConfiguring(DbContextOptionsBuilder options) {
 		// connect to postgres with connection string from app settings
-		options.UseNpgsql(Configuration.GetConnectionString("UsersHandlerDbContext"));
+		options.UseNpgsql(Configuration.GetConnectionString("MusicalScoresHandlerDbContext"));
 	}
 }

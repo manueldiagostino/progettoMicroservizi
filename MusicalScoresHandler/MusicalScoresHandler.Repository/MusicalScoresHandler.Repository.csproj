@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <ProjectReference Include="../../GlobalUtility/GlobalUtility.Manager/GlobalUtility.Manager.csproj" />
+    <ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

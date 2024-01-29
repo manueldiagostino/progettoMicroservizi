@@ -11,7 +11,6 @@ namespace MusicalScoresHandler.Repository.Repository;
 public class PdfFilesRepository : IPdfFilesRepository {
 	protected readonly MusicalScoresHandlerDbContext _dbContext;
 	private readonly ILogger _logger;
-
 	public PdfFilesRepository(MusicalScoresHandlerDbContext musicalScoresHandlerDbContext, ILogger<Repository> logger) {
 		_dbContext = musicalScoresHandlerDbContext;
 		_logger = logger;

@@ -5,16 +5,14 @@ using Microsoft.OpenApi.Models;
 using MusicalScoresHandler.Repository.Repository;
 using MusicalScoresHandler.Business.Abstraction;
 using MusicalScoresHandler.Business.Business;
+using GlobalUtility.Kafka.Abstraction.MessageHandler;
+using MusicalScoresHandler.Business.Kafka;
+using GlobalUtility.Kafka.Config;
+using AuthorsHandler.ClientHttp.Abstraction;
+using AuthorsHandler.ClientHttp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => {
-	c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicalScoresHandlerApi", Version = "v1" });  
-    c.OperationFilter<FileUploadOperationFilter>();
-});
 builder.Services.AddLogging(logging => logging.AddConsole());
 
 builder.Services.AddControllers();
@@ -26,6 +24,32 @@ builder.Services.AddScoped<IPdfFilesRepository, PdfFilesRepository>();
 builder.Services.AddScoped<IMusicalScoresRepository, MusicalScoresRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IBusiness, Business>();
+
+string baseAddress = builder.Configuration.GetSection("MusicalScoresHandlerClientHttp:AuthorsAPIBaseAddress").Value ?? throw new Exception("No such BaseAddress");
+Console.WriteLine("Section value " + baseAddress);
+Uri httpClientUri = new Uri(baseAddress);
+
+try {
+	builder.Services.AddHttpClient<IAuthorsHandlerClientHttp, AuthorsHandlerClientHttp>("MusicalScoresHandlerClientHttp", httpClient => {
+		httpClient.BaseAddress = httpClientUri;
+	});
+} catch (Exception) {
+	Console.Error.WriteLine(httpClientUri);
+}
+
+
+builder.Services.AddScoped<IKafkaTopics, KafkaTopicsInput>();
+builder.Services.AddScoped<IAuthorKafkaRepository, AuthorKafkaRepository>();
+builder.Services.AddScoped<IMessageHandler, MessageHandler>();
+builder.Services.AddScoped<IMessageHandlerFactory, MessageHandlerFactory>();
+
+builder.Services.AddKafkaConsumerService<KafkaTopicsInput, MessageHandlerFactory>(builder.Configuration);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c => {
+	c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicalScoresHandlerApi", Version = "v1" });
+	c.OperationFilter<FileUploadOperationFilter>();
+});
 
 var app = builder.Build();
 

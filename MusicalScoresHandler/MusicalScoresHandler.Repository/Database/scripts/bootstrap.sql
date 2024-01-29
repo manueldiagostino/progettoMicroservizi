@@ -2,9 +2,24 @@
 
 \connect "postgres";
 
+DROP TABLE IF EXISTS "author_kafka";
+DROP SEQUENCE IF EXISTS author_kafka_id_seq;
+CREATE SEQUENCE author_kafka_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."author_kafka" (
+    "id" integer DEFAULT nextval('author_kafka_id_seq') NOT NULL,
+    "author_id" integer NOT NULL,
+    "name" character varying(128) NOT NULL,
+    "surname" character varying NOT NULL,
+    CONSTRAINT "author_kafka_author_id" UNIQUE ("author_id"),
+    CONSTRAINT "author_kafka_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+TRUNCATE "author_kafka";
+
 DROP TABLE IF EXISTS "copyright";
 DROP SEQUENCE IF EXISTS copyright_id_seq;
-CREATE SEQUENCE copyright_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 2 CACHE 1;
+CREATE SEQUENCE copyright_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."copyright" (
     "id" integer DEFAULT nextval('copyright_id_seq') NOT NULL,
@@ -18,7 +33,7 @@ INSERT INTO "copyright" ("id", "name") VALUES
 
 DROP TABLE IF EXISTS "genre";
 DROP SEQUENCE IF EXISTS genre_id_seq;
-CREATE SEQUENCE genre_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 5 CACHE 1;
+CREATE SEQUENCE genre_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."genre" (
     "id" integer DEFAULT nextval('genre_id_seq') NOT NULL,
@@ -36,7 +51,7 @@ INSERT INTO "genre" ("id", "name") VALUES
 
 DROP TABLE IF EXISTS "musical_score";
 DROP SEQUENCE IF EXISTS musical_score_id_seq;
-CREATE SEQUENCE musical_score_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 4 CACHE 1;
+CREATE SEQUENCE musical_score_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 7 CACHE 1;
 
 CREATE TABLE "public"."musical_score" (
     "id" integer DEFAULT nextval('musical_score_id_seq') NOT NULL,
@@ -51,8 +66,12 @@ CREATE TABLE "public"."musical_score" (
 
 TRUNCATE "musical_score";
 INSERT INTO "musical_score" ("id", "title", "alias", "year_of_composition", "description", "opus", "author_id") VALUES
-(2,	'Ballade No. 3',	NULL,	'1840-41',	'1 ballad (Allegretto)',	'Op. 47',	1),
-(3,	'Sonata No. 8',	'Pathétique',	'1798',	'three movements',	'Op. 13',	2);
+(1,	'Ballade No.3',	NULL,	'1840-41',	'1 ballad (Allegretto)',	'Op.47',	1),
+(2,	'Sonata No.8',	'Pathétique',	'1798',	'3 movements',	'Op.13',	2),
+(3,	'Nocturnes',	NULL,	'1836',	'2 pieces',	'Op.27',	1),
+(4,	'Piano Quintet in A major',	'The troute',	'1819?',	'5 movements',	'D.667',	1),
+(5,	'Symphony No.41 in C major',	'Jupiter',	'1788 (August 10)',	'4 movements',	'K.551',	3),
+(6,	'Symphony No.9',	NULL,	'1822-1824',	'4 movements',	'Op.125',	4);
 
 DROP TABLE IF EXISTS "pdf_file";
 DROP SEQUENCE IF EXISTS pdf_file_id_seq;
@@ -75,12 +94,13 @@ CREATE TABLE "public"."pdf_file" (
 TRUNCATE "pdf_file";
 INSERT INTO "pdf_file" ("id", "musical_score_id", "path", "upload_date", "publisher", "copyright_id", "is_urtext", "user_id", "comments") VALUES
 (1,	2,	'PdfScores/MSL_Y120biIeMSa6jTXYPhDYSQY_IMSLP86694-PMLP01648-chopin-ballade_no_3.pdf',	'2024-01-25',	'Leipzig: C.F. Peters',	1,	'f',	0,	'#41057: 600 dpi no page cleaning!'),
-(3,	3,	'PdfScores/MSL_SvaG64K4eVBCopUQy8Fpb4H_IMSLP03865-Beethoven_-_Piano_Sonatas_Lamond_-_8.pdf',	'2024-01-26',	'Klaviersonaten, Band I Berlin: Ullstein, n.d.(ca.1918). Reissue - Leipzig: Breitkopf und Härtel, 1923. Plate 28726.',	1,	'f',	0,	NULL),
-(4,	3,	'PdfScores/MSL_QFZHh6AszsDfgmUQNkeuPrZ_IMSLP894991-PMLP1410-Sonata_No._8.pdf',	'2024-01-26',	'	Louis Köhler (1820-1886) Adolf Ruthardt (1849-1934)',	1,	'f',	0,	'	scanned at 600 dpi (for title pages see Piano Sonata No.1, Op.2 No.1), original papersize and borders. If you rate this score, please give feedback to scanner talk');
+(2,	3,	'PdfScores/MSL_SvaG64K4eVBCopUQy8Fpb4H_IMSLP03865-Beethoven_-_Piano_Sonatas_Lamond_-_8.pdf',	'2024-01-26',	'Klaviersonaten, Band I Berlin: Ullstein, n.d.(ca.1918). Reissue - Leipzig: Breitkopf und Härtel, 1923. Plate 28726.',	1,	'f',	0,	NULL),
+(3,	3,	'PdfScores/MSL_QFZHh6AszsDfgmUQNkeuPrZ_IMSLP894991-PMLP1410-Sonata_No._8.pdf',	'2024-01-26',	'	Louis Köhler (1820-1886) Adolf Ruthardt (1849-1934)',	1,	'f',	0,	'	scanned at 600 dpi (for title pages see Piano Sonata No.1, Op.2 No.1), original papersize and borders. If you rate this score, please give feedback to scanner talk'),
+(4,	5,	'PdfScores/MSL_Z5ohEghBgJQItLZBepeXOAt_IMSLP751817-PMLP1573-00_MOZART_SYM_41_in_C_minor,_K551_(Jupiter)_-_Score.pdf',	'2024-01-28',	'Howard Chandler Robbins Landon (1926-2009)',	1,	't',	0,	NULL);
 
 DROP TABLE IF EXISTS "score_genre_relationship";
 DROP SEQUENCE IF EXISTS score_genre_relationship_id_seq;
-CREATE SEQUENCE score_genre_relationship_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 3 CACHE 1;
+CREATE SEQUENCE score_genre_relationship_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."score_genre_relationship" (
     "id" integer DEFAULT nextval('score_genre_relationship_id_seq') NOT NULL,
@@ -100,4 +120,4 @@ ALTER TABLE ONLY "public"."pdf_file" ADD CONSTRAINT "pdf_file_musical_score_id_f
 ALTER TABLE ONLY "public"."score_genre_relationship" ADD CONSTRAINT "score_genre_relationship_genre_id_fkey" FOREIGN KEY (genre_id) REFERENCES genre(id) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."score_genre_relationship" ADD CONSTRAINT "score_genre_relationship_score_id_fkey" FOREIGN KEY (score_id) REFERENCES musical_score(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
--- 2024-01-26 10:28:42.45697+00
+-- 2024-01-28 17:37:49.240806+00

@@ -12,4 +12,5 @@ public interface IMusicalScoresRepository {
 	Task<List<MusicalScore>> GetAllMusicalScores(CancellationToken cancellationToken = default);
 	Task<MusicalScore> UpdateMusicalScore(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default);
 	Task<MusicalScore> DeleteMusicalScore(int id, CancellationToken cancellationToken = default);
+	public Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default);
 }

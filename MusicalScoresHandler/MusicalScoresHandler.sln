@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Business", "MusicalScoresHandler.Business\MusicalScoresHandler.Business.csproj", "{8E25019F-8FB2-4FD2-A091-E69F9E2BF34A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.Shared", "MusicalScoresHandler.Shared\MusicalScoresHandler.Shared.csproj", "{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicalScoresHandler.ClientHttp", "MusicalScoresHandler.ClientHttp\MusicalScoresHandler.ClientHttp.csproj", "{77EA64A5-2EAE-4250-B7D1-297DF6EA0845}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +38,9 @@ Global
 		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31E5A1DB-23A0-4034-AA4F-BF032EC3C1E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77EA64A5-2EAE-4250-B7D1-297DF6EA0845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77EA64A5-2EAE-4250-B7D1-297DF6EA0845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77EA64A5-2EAE-4250-B7D1-297DF6EA0845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77EA64A5-2EAE-4250-B7D1-297DF6EA0845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -2,8 +2,10 @@
   <ItemGroup>
     <ProjectReference Include="..\MusicalScoresHandler.Repository\MusicalScoresHandler.Repository.csproj" />
     <ProjectReference Include="..\MusicalScoresHandler.Shared\MusicalScoresHandler.Shared.csproj" />
-
     <ProjectReference Include="../../GlobalUtility/GlobalUtility.Manager/GlobalUtility.Manager.csproj" />
+    <ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
+    <ProjectReference Include="../../AuthorsHandler/AuthorsHandler.ClientHttp/AuthorsHandler.ClientHttp.csproj" />
+    <ProjectReference Include="..\MusicalScoresHandler.ClientHttp\MusicalScoresHandler.ClientHttp.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

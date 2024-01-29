@@ -37,4 +37,5 @@ public interface IRepository {
 	Task<PdfFile> UpdatePdfFileInfo(int fileId, PdfFileReadDto pdfFileReadDto, CancellationToken cancellationToken = default);
 	Task<PdfFile> UpdatePdfFile(int fileId, string newPath, CancellationToken cancellationToken = default);
 	Task<PdfFile> DeletePdfFile(int id, CancellationToken cancellationToken = default);
+	Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default);
 }

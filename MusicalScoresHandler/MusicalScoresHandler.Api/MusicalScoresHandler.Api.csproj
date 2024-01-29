@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MusicalScoresHandler.Repository\MusicalScoresHandler.Repository.csproj" />
     <ProjectReference Include="..\MusicalScoresHandler.Business\MusicalScoresHandler.Business.csproj" />
+    <ProjectReference Include="..\MusicalScoresHandler.ClientHttp\MusicalScoresHandler.ClientHttp.csproj" />
   </ItemGroup>
 </Project>
