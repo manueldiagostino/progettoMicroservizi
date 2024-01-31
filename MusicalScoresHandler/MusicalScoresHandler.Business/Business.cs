@@ -343,11 +343,15 @@ namespace MusicalScoresHandler.Business.Business {
 
 		public async Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default) {
 			var copyright = await _repository.UpdateCopyright(oldName, newName, cancellationToken);
+			await _repository.SaveChangesAsync(cancellationToken);
+
 			return copyright;
 		}
 
 		public async Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default) {
 			var copyright = await _repository.DeleteCopyright(name, cancellationToken);
+			await _repository.SaveChangesAsync(cancellationToken);
+			
 			return copyright;
 		}
 	}
