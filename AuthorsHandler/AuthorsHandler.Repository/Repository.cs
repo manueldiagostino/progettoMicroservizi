@@ -40,7 +40,7 @@ namespace AuthorsHandler.Repository {
 
 			List<Author> authorList = await queryable.ToListAsync(cancellationToken: cancellationToken);
 			if (authorList.Count != 1)
-				throw new RepositoryException($"Found <{authorList.Count}> author for <{surname} {name}>");
+				throw new RepositoryException($"Found <{authorList.Count}> authors for <{surname} {name}>");
 
 			return authorList[0];
 		}

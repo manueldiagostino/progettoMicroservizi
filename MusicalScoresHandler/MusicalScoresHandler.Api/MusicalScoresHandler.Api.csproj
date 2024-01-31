@@ -7,6 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <ProjectReference Include="../../GlobalUtility/GlobalUtility.Manager/GlobalUtility.Manager.csproj" />
   </ItemGroup>
@@ -14,5 +17,7 @@
     <ProjectReference Include="..\MusicalScoresHandler.Repository\MusicalScoresHandler.Repository.csproj" />
     <ProjectReference Include="..\MusicalScoresHandler.Business\MusicalScoresHandler.Business.csproj" />
     <ProjectReference Include="..\MusicalScoresHandler.ClientHttp\MusicalScoresHandler.ClientHttp.csproj" />
+	<ProjectReference Include="../../AuthorsHandler/AuthorsHandler.ClientHttp/AuthorsHandler.ClientHttp.csproj" />
+    <ProjectReference Include="../../UsersHandler/UsersHandler.ClientHttp/UsersHandler.ClientHttp.csproj" />
   </ItemGroup>
 </Project>

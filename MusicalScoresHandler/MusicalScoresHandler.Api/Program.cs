@@ -10,6 +10,8 @@ using MusicalScoresHandler.Business.Kafka;
 using GlobalUtility.Kafka.Config;
 using AuthorsHandler.ClientHttp.Abstraction;
 using AuthorsHandler.ClientHttp;
+using UsersHandler.ClientHttp;
+using UsersHandler.ClientHttp.Abstraction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,22 +27,34 @@ builder.Services.AddScoped<IMusicalScoresRepository, MusicalScoresRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IBusiness, Business>();
 
-string baseAddress = builder.Configuration.GetSection("MusicalScoresHandlerClientHttp:AuthorsAPIBaseAddress").Value ?? throw new Exception("No such BaseAddress");
-Console.WriteLine("Section value " + baseAddress);
-Uri httpClientUri = new Uri(baseAddress);
+
+// string baseAddress = builder.Configuration.GetSection("MusicalScoresHandlerClientHttp:UsersAPIBaseAddress").Value ?? throw new Exception("No such BaseAddress");
+// Console.WriteLine("Section value " + baseAddress);
+// Uri httpClientUri = new Uri(baseAddress);
 
 try {
-	builder.Services.AddHttpClient<IAuthorsHandlerClientHttp, AuthorsHandlerClientHttp>("MusicalScoresHandlerClientHttp", httpClient => {
-		httpClient.BaseAddress = httpClientUri;
-	});
+	builder.Services.AddHttpClient<IUsersHandlerClientHttp, UsersHandlerClientHttp>("MusicalScoresHandler_UsersClientHttp");
 } catch (Exception) {
-	Console.Error.WriteLine(httpClientUri);
+	Console.Error.WriteLine("MusicalScoresHandler_UsersClientHttp not found");
 }
+
+// baseAddress = builder.Configuration.GetSection("MusicalScoresHandlerClientHttp:AuthorsAPIBaseAddress").Value ?? throw new Exception("No such BaseAddress");
+// Console.WriteLine("Section value " + baseAddress);
+// httpClientUri = new Uri(baseAddress);
+
+try {
+	builder.Services.AddHttpClient<IAuthorsHandlerClientHttp, AuthorsHandlerClientHttp>("MusicalScoresHandler_AuthorsClientHttp");
+} catch (Exception) {
+	Console.Error.WriteLine("MusicalScoresHandler_UsersClientHttp not found");
+}
+// HttpClientFactoryServiceCollectionExtensions.AddHttpClient(builder.Services);
 
 
 builder.Services.AddScoped<IKafkaTopics, KafkaTopicsInput>();
 builder.Services.AddScoped<IAuthorKafkaRepository, AuthorKafkaRepository>();
-builder.Services.AddScoped<IMessageHandler, MessageHandler>();
+builder.Services.AddScoped<IUserKafkaRepository, UserKafkaRepository>();
+builder.Services.AddScoped<IMessageHandler, AuthorMessageHandler>();
+builder.Services.AddScoped<IMessageHandler, UserMessageHandler>();
 builder.Services.AddScoped<IMessageHandlerFactory, MessageHandlerFactory>();
 
 builder.Services.AddKafkaConsumerService<KafkaTopicsInput, MessageHandlerFactory>(builder.Configuration);

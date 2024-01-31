@@ -74,15 +74,15 @@ namespace MusicalScoresHandler.Repository.Repository {
 			return await GetUnique(name, cancellationToken);
 		}
 
-		public async Task<Copyright> UpdateCopyright(CopyrightDto copyrightDto, CancellationToken cancellationToken = default) {
-			var queryable = GetQueryable(copyrightDto.Name);
+		public async Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default) {
+			var queryable = GetQueryable(oldName);
 
 			List<Copyright> copyrightList = await queryable.ToListAsync(cancellationToken: cancellationToken);
 			if (copyrightList.Count != 1)
-				throw new RepositoryException($"Found <{copyrightList.Count}> copyrights for name <{copyrightDto.Name}>");
+				throw new RepositoryException($"Found <{copyrightList.Count}> copyrights for name <{newName}>");
 
 			await queryable.ExecuteUpdateAsync(x => x
-				.SetProperty(x => x.Name, copyrightDto.Name)
+				.SetProperty(x => x.Name, newName)
 			, cancellationToken: cancellationToken);
 
 			return copyrightList[0];

@@ -29,7 +29,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Created Score-Genre Relationship: ScoreId={relationshipDto.ScoreId}, GenreId={relationshipDto.GenreId}");
 			} catch (Exception e) {
 				_logger.LogError($"Failed to create Score-Genre Relationship: {e}");
-				return BadRequest($"Failed to create Score-Genre Relationship: {e.Message}");
+				return BadRequest($"Failed to create Score-Genre Relationship: {e}");
 			}
 		}
 
@@ -40,8 +40,8 @@ namespace MusicalScoresHandler.Api.Controllers {
 				_logger.LogInformation($"Retrieved {list.Count} genres for ScoreId={scoreId}");
 				return Ok($"{JsonSerializer.Serialize(list)}");
 			} catch (Exception e) {
-				_logger.LogError($"Failed to retrieve genres for ScoreId={scoreId}: {e.Message}");
-				return BadRequest($"Failed to retrieve genres for ScoreId={scoreId}: {e.Message}");
+				_logger.LogError($"Failed to retrieve genres for ScoreId={scoreId}: {e}");
+				return BadRequest($"Failed to retrieve genres for ScoreId={scoreId}: {e}");
 			}
 		}
 
@@ -52,8 +52,8 @@ namespace MusicalScoresHandler.Api.Controllers {
 				_logger.LogInformation($"Deleted Score-Genre Relationship: Id={deletedRelationship.Id}");
 				return Ok($"Deleted Score-Genre Relationship: Id={deletedRelationship.Id}");
 			} catch (Exception e) {
-				_logger.LogError($"Failed to delete Score-Genre Relationship with Id={id}: {e.Message}");
-				return BadRequest($"Failed to delete Score-Genre Relationship with Id={id}: {e.Message}");
+				_logger.LogError($"Failed to delete Score-Genre Relationship with Id={id}: {e}");
+				return BadRequest($"Failed to delete Score-Genre Relationship with Id={id}: {e}");
 			}
 		}
 	}

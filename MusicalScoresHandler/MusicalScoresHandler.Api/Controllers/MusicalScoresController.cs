@@ -29,7 +29,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Created Musical Score <{JsonSerializer.Serialize(musicalScoreDto)}>");
 			} catch (Exception e) {
 				_logger.LogError($"Error creating Musical Score: {e}");
-				return BadRequest($"Error creating Musical Score: {e.Message}");
+				return BadRequest($"Error creating Musical Score: {e}");
 			}
 		}
 
@@ -41,7 +41,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Retrieved Musical Score with Id: <{id}>\n{JsonSerializer.Serialize(musicalScore)}");
 			} catch (Exception e) {
 				_logger.LogError($"Error getting Musical Score: {e}");
-				return BadRequest($"Error getting Musical Score: {e.Message}");
+				return BadRequest($"Error getting Musical Score: {e}");
 			}
 		}
 
@@ -53,7 +53,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"{JsonSerializer.Serialize(musicalScores)}");
 			} catch (Exception e) {
 				_logger.LogError($"Error getting Musical Scores: {e}");
-				return BadRequest($"Error getting Musical Scores: {e.Message}");
+				return BadRequest($"Error getting Musical Scores: {e}");
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok(updatedMusicalScore);
 			} catch (Exception e) {
 				_logger.LogError($"Error updating Musical Score: {e}");
-				return BadRequest($"Error updating Musical Score: {e.Message}");
+				return BadRequest($"Error updating Musical Score: {e}");
 			}
 		}
 
@@ -77,7 +77,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok(deletedMusicalScore);
 			} catch (Exception e) {
 				_logger.LogError($"Error deleting Musical Score: {e}");
-				return BadRequest($"Error deleting Musical Score: {e.Message}");
+				return BadRequest($"Error deleting Musical Score: {e}");
 			}
 		}
 	}

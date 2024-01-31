@@ -46,7 +46,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Created PDF File: {JsonSerializer.Serialize(pdfFileDto)}");
 			} catch (Exception e) {
 				_logger.LogError($"Error creating PDF File: {e}");
-				return BadRequest($"Error creating PDF File: {e.Message}");
+				return BadRequest($"Error creating PDF File: {e}");
 			}
 		}
 
@@ -68,7 +68,20 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return PhysicalFile(filePath, contentType, Path.GetFileName(filePath));
 
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
+			}
+		}
+
+		[HttpGet(Name = "GetPdfFilesListForMusicalScore")]
+		public async Task<ActionResult> GetPdfFilesListForMusicalScore(int scoreId) {
+			try {
+				var pdfFiles = await _business.GetPdfFilesForMusicalScore(scoreId);
+				_logger.LogInformation($"Retrieved {pdfFiles.Count} PDF Files for Musical Score Id: {scoreId}");
+ 
+				return Ok($"{JsonSerializer.Serialize(pdfFiles)}");
+			} catch (Exception e) {
+				_logger.LogError($"Error getting PDF FilesList: {e}");
+				return BadRequest($"Error getting PDF FilesList: {e}");
 			}
 		}
 
@@ -86,7 +99,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return fileStreamResult;
 			} catch (Exception e) {
 				_logger.LogError($"Error getting PDF Files: {e}");
-				return BadRequest($"Error getting PDF Files: {e.Message}");
+				return BadRequest($"Error getting PDF Files: {e}");
 			}
 		}
 
@@ -98,7 +111,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Updated PDF File with Id: {updatedPdfFile.Id}");
 			} catch (Exception e) {
 				_logger.LogError($"Error updating PDF File: {e}");
-				return BadRequest($"Error updating PDF File: {e.Message}");
+				return BadRequest($"Error updating PDF File: {e}");
 			}
 		}
 
@@ -118,7 +131,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Updated PDF File with Id: {updatedPdfFile.Id}");
 			} catch (Exception e) {
 				_logger.LogError($"Error updating PDF File: {e}");
-				return BadRequest($"Error updating PDF File: {e.Message}");
+				return BadRequest($"Error updating PDF File: {e}");
 			}
 		}
 
@@ -130,7 +143,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok(deletedPdfFile);
 			} catch (Exception e) {
 				_logger.LogError($"Error deleting PDF File: {e}");
-				return BadRequest($"Error deleting PDF File: {e.Message}");
+				return BadRequest($"Error deleting PDF File: {e}");
 			}
 		}
 	}

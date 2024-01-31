@@ -12,6 +12,7 @@ public class MusicalScoresHandlerDbContext : DbContext {
 	public DbSet<ScoreGenreRelationship> ScoreGenreRelationships { get; set; }
 	public DbSet<Copyright> Copyrights { get; set; }
 	public DbSet<AuthorKafka> AuthorsKafka { get; set; }
+	public DbSet<UserKafka> UsersKafka { get; set; }
 	
 	public MusicalScoresHandlerDbContext(IConfiguration configuration) {
 		Configuration = configuration;
@@ -63,7 +64,6 @@ public class MusicalScoresHandlerDbContext : DbContext {
 		
 		
 		modelBuilder.Entity<PdfFile>().ToTable("pdf_file");
-		modelBuilder.Entity<PdfFile>().HasKey(x => x.Id);
 		modelBuilder.Entity<PdfFile>()
 			.HasOne(x => x.MusicalScore)
 			.WithMany(s => s.PdfFiles)
@@ -103,6 +103,13 @@ public class MusicalScoresHandlerDbContext : DbContext {
 		modelBuilder.Entity<AuthorKafka>().Property(x => x.Name).HasColumnName("name");
 		modelBuilder.Entity<AuthorKafka>().Property(x => x.Surname).HasColumnName("surname");
 		
+		modelBuilder.Entity<UserKafka>().ToTable("user_kafka");
+		modelBuilder.Entity<UserKafka>().HasKey(x => x.Id);
+		modelBuilder.Entity<UserKafka>().Property(x => x.Id).HasColumnName("id");
+		modelBuilder.Entity<UserKafka>().Property(x => x.UserId).HasColumnName("user_id");
+		modelBuilder.Entity<UserKafka>().Property(x => x.Username).HasColumnName("username");
+		modelBuilder.Entity<UserKafka>().Property(x => x.Name).HasColumnName("name");
+		modelBuilder.Entity<UserKafka>().Property(x => x.Surname).HasColumnName("surname");
 	}
 
 	protected override void OnConfiguring(DbContextOptionsBuilder options) {

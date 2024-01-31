@@ -1,14 +1,14 @@
 using System.Text.Json;
 using GlobalUtility.Kafka.Exceptions;
-using GlobalUtility.Kafka.MessageHandlers;
 using Microsoft.Extensions.Logging;
 using MusicalScoresHandler.Repository.Abstraction;
 using MusicalScoresHandler.Repository.Model;
+using GlobalUtility.Kafka.MessageHandlers;
 
 namespace MusicalScoresHandler.Business.Kafka;
 
-public class MessageHandler : AbstractOperationMessageHandler<AuthorKafkaDto, IAuthorKafkaRepository> {
-	public MessageHandler(ILogger<AbstractOperationMessageHandler<AuthorKafkaDto, IAuthorKafkaRepository>> logger, IAuthorKafkaRepository repository) : base(logger, repository) {
+public class AuthorMessageHandler : AbstractOperationMessageHandler<AuthorKafkaDto, IAuthorKafkaRepository> {
+	public AuthorMessageHandler(ILogger<AbstractOperationMessageHandler<AuthorKafkaDto, IAuthorKafkaRepository>> logger, IAuthorKafkaRepository repository) : base(logger, repository) {
 
 	}
 

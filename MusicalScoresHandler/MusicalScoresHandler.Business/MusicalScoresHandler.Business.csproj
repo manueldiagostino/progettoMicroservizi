@@ -5,6 +5,7 @@
     <ProjectReference Include="../../GlobalUtility/GlobalUtility.Manager/GlobalUtility.Manager.csproj" />
     <ProjectReference Include="../../GlobalUtility/GlobalUtility.Kafka/GlobalUtility.Kafka.csproj" />
     <ProjectReference Include="../../AuthorsHandler/AuthorsHandler.ClientHttp/AuthorsHandler.ClientHttp.csproj" />
+    <ProjectReference Include="../../UsersHandler/UsersHandler.ClientHttp/UsersHandler.ClientHttp.csproj" />
     <ProjectReference Include="..\MusicalScoresHandler.ClientHttp\MusicalScoresHandler.ClientHttp.csproj" />
   </ItemGroup>
   <PropertyGroup>

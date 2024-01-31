@@ -28,7 +28,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Created Genre <{genreDto.Name}>");
 			} catch (Exception e) {
 				_logger.LogError($"Error creating Genre: {e}");
-				return BadRequest($"Error creating Genre: {e.Message}");
+				return BadRequest($"Error creating Genre: {e}");
 			}
 		}
 
@@ -39,7 +39,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok(JsonSerializer.Serialize(genres));
 			} catch (Exception e) {
 				_logger.LogError($"Error getting all genres: {e}");
-				return BadRequest($"Error getting all genres: {e.Message}");
+				return BadRequest($"Error getting all genres: {e}");
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok(genre);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting genre by name: {e}");
-				return BadRequest($"Error getting genre by name: {e.Message}");
+				return BadRequest($"Error getting genre by name: {e}");
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Updated Genre <{genreDto.Name}> to {updatedGenre.Name}");
 			} catch (Exception e) {
 				_logger.LogError($"Error updating Genre: {e}");
-				return BadRequest($"Error updating Genre: {e.Message}");
+				return BadRequest($"Error updating Genre: {e}");
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				return Ok($"Deleted Genre <{deletedGenre.Name}>");
 			} catch (Exception e) {
 				_logger.LogError($"Error deleting Genre: {e}");
-				return BadRequest($"Error deleting Genre: {e.Message}");
+				return BadRequest($"Error deleting Genre: {e}");
 			}
 		}
 	}

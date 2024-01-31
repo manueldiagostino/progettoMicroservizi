@@ -42,7 +42,7 @@ public class MusicalScoresRepository : IMusicalScoresRepository {
 			.ToListAsync(cancellationToken: cancellationToken);
 
 		if (musicalScoreList.Count != 1) {
-			throw new RepositoryException($"Found <{musicalScoreList.Count}> genres for <{JsonSerializer.Serialize(musicalScoreDto)}>");
+			throw new RepositoryException($"Found <{musicalScoreList.Count}> MusicalScores for <{JsonSerializer.Serialize(musicalScoreDto)}>");
 		}
 
 		return musicalScoreList[0].Id;

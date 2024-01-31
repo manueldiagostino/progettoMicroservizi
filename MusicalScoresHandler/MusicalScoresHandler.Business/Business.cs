@@ -13,25 +13,32 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AuthorsHandler.ClientHttp.Abstraction;
+using UsersHandler.ClientHttp.Abstraction;
 
 namespace MusicalScoresHandler.Business.Business {
 	public class Business : IBusiness {
 		private readonly ILogger _logger;
 		private readonly IRepository _repository;
 
-		private readonly IAuthorKafkaRepository _kafkaRepository;
-		private readonly IAuthorsHandlerClientHttp _clientHttp;
+		private readonly IAuthorKafkaRepository _authorKafkaRepository;
+		private readonly IUserKafkaRepository _userKafkaRepository;
+		private readonly IAuthorsHandlerClientHttp _authorsClientHttp;
+		private readonly IUsersHandlerClientHttp _usersClientHttp;
 
 		public Business(
 		ILogger<Business> logger,
 		IRepository repository,
-		IAuthorKafkaRepository kafkaRepository,
-		IAuthorsHandlerClientHttp clientHttp) {
+		IAuthorKafkaRepository authorKafkaRepository,
+		IUserKafkaRepository userKafkaRepository,
+		IAuthorsHandlerClientHttp authorsClientHttp,
+		IUsersHandlerClientHttp usersClientHttp) {
 
 			_logger = logger;
 			_repository = repository;
-			_kafkaRepository = kafkaRepository;
-			_clientHttp = clientHttp;
+			_authorKafkaRepository = authorKafkaRepository;
+			_userKafkaRepository = userKafkaRepository;
+			_authorsClientHttp = authorsClientHttp;
+			_usersClientHttp = usersClientHttp;
 		}
 
 		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) {
@@ -82,9 +89,9 @@ namespace MusicalScoresHandler.Business.Business {
 			return deletedGenre;
 		}
 
-		private async Task CheckWithHttp(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
+		private async Task CheckAuthorWithHttp(MusicalScoreDto musicalScoreDto, CancellationToken cancellationToken = default) {
 			_logger.LogInformation($"Failed checking musicalScoreDto.AuthorId from cache, trying with http...");
-			HttpResponseMessage response = await _clientHttp.GetAuthorFromId(musicalScoreDto.AuthorId, cancellationToken);
+			HttpResponseMessage response = await _authorsClientHttp.GetAuthorFromId(musicalScoreDto.AuthorId, cancellationToken);
 
 			if (!response.IsSuccessStatusCode)
 				throw new BusinessException($"No such author for id <{musicalScoreDto.AuthorId}>");
@@ -98,6 +105,9 @@ namespace MusicalScoresHandler.Business.Business {
 			};
 
 			AuthorKafkaDto? authorDto = JsonSerializer.Deserialize<AuthorKafkaDto>(authorString, deserializeOptions);
+			if (authorDto == null)
+				throw new BusinessException($"CheckAuthorWithHttp: authorDto == null");
+
 			_logger.LogInformation($"Deserialized AuthorKafkaDto <{JsonSerializer.Serialize(authorDto)}>");
 
 			AuthorKafka author = new() {
@@ -106,8 +116,8 @@ namespace MusicalScoresHandler.Business.Business {
 				Surname = authorDto.Surname
 			};
 
-			await _kafkaRepository.InsertAuthor(author, cancellationToken);
-			await _kafkaRepository.SaveChangesAsync(cancellationToken);
+			await _authorKafkaRepository.InsertAuthor(author, cancellationToken);
+			await _authorKafkaRepository.SaveChangesAsync(cancellationToken);
 			_logger.LogInformation($"Saved AuthorKafka into DBMS");
 		}
 
@@ -117,8 +127,8 @@ namespace MusicalScoresHandler.Business.Business {
 				throw new BusinessException("musicalScoreDto == null");
 
 			// Check validity of the autorId
-			if (!await _kafkaRepository.CheckAuthorId(musicalScoreDto.AuthorId))
-				await CheckWithHttp(musicalScoreDto, cancellationToken);
+			if (!await _authorKafkaRepository.CheckAuthorId(musicalScoreDto.AuthorId, cancellationToken))
+				await CheckAuthorWithHttp(musicalScoreDto, cancellationToken);
 
 			await _repository.CreateMusicalScore(musicalScoreDto, cancellationToken);
 			await SaveChangesAsync(cancellationToken);
@@ -207,6 +217,39 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 		// Operazioni CRUD per PdfFile
+		private async Task CheckUserWithHttp(PdfFileReadDto pdfFileDto, CancellationToken cancellationToken = default) {
+			_logger.LogInformation($"Failed checking musicalScoreDto.AuthorId from cache, trying with http...");
+			HttpResponseMessage response = await _usersClientHttp.GetUserFromId(pdfFileDto.UserId, cancellationToken);
+
+			if (!response.IsSuccessStatusCode)
+				throw new BusinessException($"No such user for id <{pdfFileDto.UserId}>");
+
+			string userString = await response.Content.ReadAsStringAsync(cancellationToken);
+			_logger.LogInformation($"Response string <{userString}>");
+
+			var deserializeOptions = new JsonSerializerOptions {
+				PropertyNameCaseInsensitive = true,
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
+
+			UserKafkaDto? userDto = JsonSerializer.Deserialize<UserKafkaDto>(userString, deserializeOptions);
+			if (userDto == null)
+				throw new BusinessException($"CheckUserWithHttp: userDto == null");
+
+			_logger.LogInformation($"Deserialized UserKafkaDto <{JsonSerializer.Serialize(userDto)}>");
+
+			UserKafka user = new() {
+				UserId = userDto.UserId,
+				Username = userDto.Username,
+				Name = userDto.Name,
+				Surname = userDto.Surname
+			};
+
+			await _userKafkaRepository.InsertUser(user, cancellationToken);
+			await _userKafkaRepository.SaveChangesAsync(cancellationToken);
+			_logger.LogInformation($"Saved UserKafka into DBMS");
+		}
+
 		public async Task CreatePdfFile(PdfFileReadDto pdfFileReadDto, IFormFile file, CancellationToken cancellationToken = default) {
 			if (pdfFileReadDto == null)
 				throw new BusinessException("pdfFileReadDto == null", nameof(pdfFileReadDto));
@@ -214,6 +257,10 @@ namespace MusicalScoresHandler.Business.Business {
 				throw new BusinessException("file == null", nameof(file));
 			if (!await _repository.CheckMusicalScoreId(pdfFileReadDto.MusicalScoreId, cancellationToken))
 				throw new BusinessException($"Error while creating new PdfFile: no such MusicalScore for id <{pdfFileReadDto.MusicalScoreId}>");
+
+			// Check validity of the userId
+			if (!await _userKafkaRepository.CheckUserId(pdfFileReadDto.UserId, cancellationToken))
+				await CheckUserWithHttp(pdfFileReadDto, cancellationToken);
 
 			string? relativePath = Files.SaveFileToDir(Path.Combine("PdfScores"), file) ?? throw new BusinessException("SaveFileToDisk returned path == null");
 
@@ -279,7 +326,29 @@ namespace MusicalScoresHandler.Business.Business {
 			return deletedPdfFile;
 		}
 
+		public async Task CreateCopyright(CopyrightDto copyrightDto, CancellationToken cancellationToken = default) {
+			await _repository.CreateCopyright(copyrightDto, cancellationToken);
+			await _repository.SaveChangesAsync(cancellationToken);
 
+			_logger.LogInformation($"Created Copyright <{JsonSerializer.Serialize(copyrightDto)}>");
+		}
 
+		public async Task<Copyright> GetCopyrightByName(string name, CancellationToken cancellationToken = default) {
+			return await _repository.GetCopyrightByName(name, cancellationToken);
+		}
+
+		public async Task<List<Copyright>> GetAllCopyrights(CancellationToken cancellationToken = default) {
+			return await _repository.GetAllCopyrights(cancellationToken);
+		}
+
+		public async Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default) {
+			var copyright = await _repository.UpdateCopyright(oldName, newName, cancellationToken);
+			return copyright;
+		}
+
+		public async Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default) {
+			var copyright = await _repository.DeleteCopyright(name, cancellationToken);
+			return copyright;
+		}
 	}
 }

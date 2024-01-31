@@ -51,8 +51,8 @@ public class UsersController : ControllerBase {
 	public async Task<ActionResult> GetIdFromUsername([FromQuery] string username) {
 		try {
 
-			int id = await _business.GetIdFromUsername(username);
-			return Ok($"User <{username}> has id <{id}>");
+			int userId = await _business.GetIdFromUsername(username);
+			return Ok($"User <{username}> has id <{userId}>");
 
 		} catch (Exception e) {
 			return BadRequest($"{e}");
@@ -60,10 +60,10 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpGet(Name = "GetUsernameFromId")]
-	public async Task<ActionResult> GetUsernameFromId([FromQuery] int id) {
+	public async Task<ActionResult> GetUsernameFromId([FromQuery] int userId) {
 		try {
 
-			UserOutType user = await _business.GetUserFromId(id);
+			UserOutType user = await _business.GetUserFromId(userId);
 			return Ok($"User <{user.UserId}> has username <{user.Username}>");
 
 		} catch (Exception e) {
@@ -72,10 +72,10 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpGet(Name = "GetUserFromId")]
-	public async Task<ActionResult> GetUserFromId([FromQuery] int id) {
+	public async Task<ActionResult> GetUserFromId([FromQuery] int userId) {
 		try {
 
-			UserOutType user = await _business.GetUserFromId(id);
+			UserOutType user = await _business.GetUserFromId(userId);
 			return Ok($"{JsonSerializer.Serialize(user)}");
 
 		} catch (Exception e) {
@@ -84,10 +84,10 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpPut(Name = "UpdateUsername")]
-	public async Task<ActionResult> UpdateUsername([FromQuery] int id, string username) {
+	public async Task<ActionResult> UpdateUsername([FromQuery] int userId, string username) {
 		try {
 
-			UserOutType user = await _business.UpdateUsername(id, username);
+			UserOutType user = await _business.UpdateUsername(userId, username);
 			return Ok($"Updated user <{user.UserId},{user.Username}> with username <{username}> ");
 
 		} catch (Exception e) {
@@ -96,10 +96,10 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpDelete(Name = "DeleteUser")]
-	public async Task<ActionResult> DeleteUser([FromQuery] int id) {
+	public async Task<ActionResult> DeleteUser([FromQuery] int userId) {
 		try {
 
-			UserOutType user = await _business.DeleteUser(id);
+			UserOutType user = await _business.DeleteUser(userId);
 			return Ok($"User <{user.UserId}, {user.Username}> deleted");
 
 		} catch (Exception e) {
@@ -162,8 +162,8 @@ public class UsersController : ControllerBase {
 		}
 		try {
 
-			int id = await _business.GetIdFromUsername(username);
-			UserOutType user = await _business.UploadProfilePictureFromId(id, file);
+			int userId = await _business.GetIdFromUsername(username);
+			UserOutType user = await _business.UploadProfilePictureFromId(userId, file);
 
 			return Ok($"Uploaded image for <{user.UserId},{user.Username}>");
 
@@ -205,10 +205,10 @@ public class UsersController : ControllerBase {
 	}
 
 	[HttpDelete(Name = "DeleteImage")]
-	public async Task<ActionResult> DeleteImage([FromQuery] int id) {
+	public async Task<ActionResult> DeleteImage([FromQuery] int userId) {
 		try {
 
-			UserOutType user = await _business.DeleteImage(id);
+			UserOutType user = await _business.DeleteImage(userId);
 			return Ok($"User <{user.UserId}, {user.Username}> deleted");
 
 		} catch (Exception e) {

@@ -136,5 +136,25 @@ namespace MusicalScoresHandler.Repository.Repository {
 		public async Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default) {
 			return await _musicalScoresRepository.CheckMusicalScoreId(scoreId, cancellationToken);
 		}
+
+		public async Task CreateCopyright(CopyrightDto copyrightDto, CancellationToken cancellationToken = default) {
+			await _copyrightRepository.CreateCopyright(copyrightDto, cancellationToken);
+		}
+
+		public async Task<Copyright> GetCopyrightByName(string name, CancellationToken cancellationToken = default) {
+			return await _copyrightRepository.GetCopyrightByName(name, cancellationToken);
+		}
+
+		public async Task<List<Copyright>> GetAllCopyrights(CancellationToken cancellationToken = default) {
+			return await _copyrightRepository.GetAllCopyrights(cancellationToken);
+		}
+
+		public async Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default) {
+			return await _copyrightRepository.UpdateCopyright(oldName, newName, cancellationToken);
+		}
+
+		public async Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default) {
+			return await _copyrightRepository.DeleteCopyright(name, cancellationToken);
+		}
 	}
 }

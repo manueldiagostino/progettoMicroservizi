@@ -7,11 +7,11 @@ using System.Text.Json;
 namespace AuthorsHandler.Controllers {
 	[ApiController]
 	[Route("[controller]/[action]")]
-	public class AuthorsHandlerController : ControllerBase {
+	public class AuthorsController : ControllerBase {
 		private readonly IBusiness _business;
 		private readonly ILogger _logger;
 
-		public AuthorsHandlerController(IBusiness business, ILogger<AuthorsHandlerController> logger) {
+		public AuthorsController(IBusiness business, ILogger<AuthorsController> logger) {
 			_business = business;
 			_logger = logger;
 		}

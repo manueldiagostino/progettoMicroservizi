@@ -110,14 +110,13 @@ namespace GlobalUtility.Kafka.Clients {
 				if (string.IsNullOrWhiteSpace(topic)) {
 					meta = _adminClient.GetMetadata(timeSpan);
 				} else {
-					topicInfo = $" per il Topic '{topic}'";
+					topicInfo = $"per il Topic '{topic}'";
 					meta = _adminClient.GetMetadata(topic, timeSpan);
 				}
 
-				_logger.LogInformation("Kafka Cluster Metadata{topicInfo}: {meta}", topicInfo, meta.ToString());
+				_logger.LogInformation("Kafka Cluster Metadata {topicInfo}: {meta}", topicInfo, meta.ToString());
 			} catch (KafkaException ex) {
 				Console.WriteLine($"Errore durante l'ottenimento dei metadati del cluster Kafka: {ex.Message}");
-				
 			}
 
 			return meta;
@@ -132,8 +131,13 @@ namespace GlobalUtility.Kafka.Clients {
 		}
 
 		public bool TopicExists(string topic) {
-			var res = GetMetadata(topic);
-			return res?.Topics.Count != 0;
+			Metadata? res = GetMetadata(topic);
+			if (res == null)
+				return false;
+
+			var topics = res.Topics.Select(t => t.Topic).ToList();
+		
+			return topics.Contains(topic);
 		}
 
 		public void Dispose() {

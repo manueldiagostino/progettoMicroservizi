@@ -13,7 +13,9 @@ public class MessageHandlerFactory : IMessageHandlerFactory {
 
 	public IMessageHandler Create(string topic, IServiceProvider serviceProvider) {
 		if (topic.Equals(_options.Authors))
-			return ActivatorUtilities.CreateInstance<MessageHandler>(serviceProvider);
+			return ActivatorUtilities.CreateInstance<AuthorMessageHandler>(serviceProvider);
+		else if (topic.Equals(_options.Users))
+			return ActivatorUtilities.CreateInstance<UserMessageHandler>(serviceProvider);
 
 		throw new MessageHandlerException($"Topic <{topic}> not allowed");
 	}

@@ -38,4 +38,11 @@ public interface IRepository {
 	Task<PdfFile> UpdatePdfFile(int fileId, string newPath, CancellationToken cancellationToken = default);
 	Task<PdfFile> DeletePdfFile(int id, CancellationToken cancellationToken = default);
 	Task<bool> CheckMusicalScoreId(int scoreId, CancellationToken cancellationToken = default);
+
+	// Operazioni CRUD per Copyright
+	Task CreateCopyright(CopyrightDto copyrightDto, CancellationToken cancellationToken = default);
+	Task<Copyright> GetCopyrightByName(string name, CancellationToken cancellationToken = default);
+	Task<List<Copyright>> GetAllCopyrights(CancellationToken cancellationToken = default);
+	Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default);
+	Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default);
 }
