@@ -2,6 +2,8 @@ using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 
 namespace GlobalUtility.Manager.Operations;
 public class Files {
@@ -82,7 +84,7 @@ public class Files {
 	}
 
 	public static FileStreamResult GenerateZipArchive(List<string> files, string zipFileName = "") {
-		zipFileName = string.IsNullOrEmpty(zipFileName)? ProjectName + '_' + GenerateRandomString(23) + ".zip" : zipFileName;
+		zipFileName = string.IsNullOrEmpty(zipFileName) ? ProjectName + '_' + GenerateRandomString(23) + ".zip" : zipFileName;
 
 		// Percorso temporaneo per creare il file ZIP
 		string tempPath = Path.Combine(Path.GetTempPath(), zipFileName);
@@ -101,5 +103,33 @@ public class Files {
 		result.FileDownloadName = zipFileName;
 
 		return result;
+	}
+
+	public static string SaveUserProfileImage(string destDir, IFormFile target) {
+		if (string.IsNullOrWhiteSpace(destDir))
+			throw new Exception($"IsNullOrWhiteSpace(destDir)");
+
+		try {
+
+			if (!Directory.Exists(destDir)) {
+				Directory.CreateDirectory(destDir);
+			}
+			string fileName = ProjectName + '_' + GenerateRandomString(23) + '_' + target.FileName;
+			string filePath = Path.Combine(destDir, fileName);
+
+			using (var stream = target.OpenReadStream()) {
+				using (var image = Image.Load(stream)) {
+					image.Mutate(x => x.Resize(600, 600));
+
+					var encoder = new PngEncoder();
+					image.Save(filePath, encoder);
+				}
+			}
+
+			Console.WriteLine($"File saved into <{filePath}>");
+			return filePath;
+		} catch (Exception ex) {
+			throw new Exception($"An error occured while saving the image: {ex.Message}");
+		}
 	}
 }
