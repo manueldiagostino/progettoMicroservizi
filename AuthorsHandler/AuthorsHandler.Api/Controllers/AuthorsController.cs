@@ -63,7 +63,7 @@ namespace AuthorsHandler.Controllers {
 		public async Task<IActionResult> GetAllAuthors() {
 			try {
 				var res = await _business.GetAllAuthors();
-				return Ok($"{JsonSerializer.Serialize(res)}");
+				return Ok(res);
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
 			}
@@ -114,7 +114,7 @@ namespace AuthorsHandler.Controllers {
 		public async Task<IActionResult> GetAuthorFromId(int authorId) {
 			try {
 				Author author = await _business.GetAuthorFromId(authorId);
-				return Ok($"{JsonSerializer.Serialize(author)}");
+				return Ok(author);
 			} catch (Exception e) {
 				return BadRequest($"{e.Message}");
 			}
