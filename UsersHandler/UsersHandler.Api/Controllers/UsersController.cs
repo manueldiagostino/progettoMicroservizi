@@ -76,7 +76,7 @@ public class UsersController : ControllerBase {
 		try {
 
 			UserOutType user = await _business.GetUserFromId(userId);
-			return Ok($"{JsonSerializer.Serialize(user)}");
+			return Ok(user);
 
 		} catch (Exception e) {
 			return BadRequest($"{e}");
