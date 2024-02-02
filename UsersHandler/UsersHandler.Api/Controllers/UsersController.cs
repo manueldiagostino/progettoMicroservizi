@@ -83,6 +83,18 @@ public class UsersController : ControllerBase {
 		}
 	}
 
+	[HttpGet(Name = "GetAllUsers")]
+	public async Task<ActionResult> GetAllUsers() {
+		try {
+
+			ICollection<UserOutType> users = await _business.GetAllUsers();
+			return Ok(users);
+
+		} catch (Exception e) {
+			return BadRequest($"{e}");
+		}
+	}
+
 	[HttpPut(Name = "UpdateUsername")]
 	public async Task<ActionResult> UpdateUsername([FromQuery] int userId, string username) {
 		try {
@@ -209,7 +221,7 @@ public class UsersController : ControllerBase {
 		try {
 
 			UserOutType user = await _business.DeleteImage(userId);
-			return Ok($"User <{user.UserId}, {user.Username}> deleted");
+			return Ok($"Profile picture for id <{userId}> deleted");
 
 		} catch (Exception e) {
 			return BadRequest($"{e}");

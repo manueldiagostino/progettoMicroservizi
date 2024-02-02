@@ -123,6 +123,8 @@ public class Repository : IRepository {
 		User user = await GetUnique(userId, cancellationToken);
 		_dbContext.Remove(user);
 
+		await DeleteImage(userId, cancellationToken);
+
 		return user;
 	}
 
@@ -138,15 +140,20 @@ public class Repository : IRepository {
 		return user.PropicPath;
 	}
 
-	public async Task<User> DeleteImage(int userId, CancellationToken cancellationToken = default) {
+	public async Task<string> DeleteImage(int userId, CancellationToken cancellationToken = default) {
 		var queryable = GetQueryable(userId);
 		User user = await GetUnique(userId, cancellationToken);
+		if (user.PropicPath == null)
+			throw new RepositoryException($"User <{user.Username}> does not have a profile picture");
+
+		string relativePath = user.PropicPath;
+		string? nullString = null;
 
 		await queryable.ExecuteUpdateAsync(x => x
-			.SetProperty(x => x.PropicPath, string.Empty)
+			.SetProperty(x => x.PropicPath, nullString)
 		, cancellationToken);
 
-		return user;
+		return relativePath;
 	}
 
 	public async Task<User> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
@@ -255,5 +262,9 @@ public class Repository : IRepository {
 		, cancellationToken);
 
 		return await GetUnique(userId);
+	}
+
+	public async Task<ICollection<User>> GetAllUsers(CancellationToken cancellationToken = default) {
+		return await _dbContext.Users.ToListAsync(cancellationToken);
 	}
 }

@@ -15,6 +15,7 @@ public interface IBusiness {
 	Task<int> GetIdFromUsername(string username, CancellationToken cancellationToken = default);
 	Task<UserOutType> UpdateUsername(int userId, string username, CancellationToken cancellationToken = default);
 	Task<UserOutType> DeleteUser(int userId, CancellationToken cancellationToken = default);
+	public Task<ICollection<UserOutType>> GetAllUsers(CancellationToken cancellationToken = default);
 
 	Task<bool> VerifyPassword(int userId, string password, CancellationToken cancellationToken = default);
 	Task<UserOutType> UpdatePassword(int userId, string oldPassword, string newPassword, CancellationToken cancellationToken = default);

@@ -121,13 +121,14 @@ public class Business : IBusiness {
 		return await GetProfilePictureFromId(id, cancellationToken);
 	}
 
+
 	public async Task<UserOutType> UploadProfilePictureFromId(int userId, IFormFile profilePicture, CancellationToken cancellationToken = default) {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 		if (profilePicture == null)
 			throw new BusinessException("profilePicture == null", nameof(profilePicture));
 
-		string? relativePath = Files.SaveFileToDir(Path.Combine("ProfilePictures"), profilePicture);
+		string relativePath = Files.SaveUserProfileImage(Path.Combine("ProfilePictures"), profilePicture);
 
 		if (relativePath == null)
 			throw new BusinessException("SaveFileToDisk returned path == null");
@@ -143,11 +144,15 @@ public class Business : IBusiness {
 		if (userId <= 0)
 			throw new BusinessException("userId <= 0", nameof(userId));
 
-		User user = await _repository.DeleteImage(userId, cancellationToken);
+		string relativePath = await _repository.DeleteImage(userId, cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
-		_logger.LogInformation($"Profile picture for id <{userId}> deleted");
 
-		return BuildUserOut(user);
+		bool isDeleted = Files.DeleteFileIfExists(relativePath);
+		if (!isDeleted)
+			throw new BusinessException($"No such file to delete");
+
+		_logger.LogInformation($"Profile picture for id <{userId}> deleted");
+		return await GetUserFromId(userId, cancellationToken);
 	}
 
 	public async Task<UserOutType> CreateBioFromId(BioDto bioDto, CancellationToken cancellationToken = default) {
@@ -210,12 +215,23 @@ public class Business : IBusiness {
 			throw new BusinessException("IsNullOrWhiteSpace(password)", nameof(oldPassword));
 		if (string.IsNullOrWhiteSpace(newPassword))
 			throw new BusinessException("IsNullOrWhiteSpace(password)", nameof(newPassword));
-		
+
 		User user = await _repository.GetUserFromId(userId, cancellationToken);
 		if (!PasswordHasher.VerifyPassword(oldPassword, user.Hash, user.Salt))
 			throw new BusinessException("Wrong password inserted", nameof(newPassword));
 
 		user = await _repository.UpdatePassword(userId, newPassword, cancellationToken);
 		return BuildUserOut(user);
+	}
+
+	public async Task<ICollection<UserOutType>> GetAllUsers(CancellationToken cancellationToken = default) {
+		ICollection<User> users = await _repository.GetAllUsers(cancellationToken);
+		List<UserOutType> usersOutType = [];
+
+		foreach (var item in users) {
+			usersOutType.Add(BuildUserOut(item));
+		}
+
+		return usersOutType;
 	}
 }

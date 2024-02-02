@@ -4,7 +4,7 @@
 
 DROP TABLE IF EXISTS "bio";
 DROP SEQUENCE IF EXISTS bio_id_seq;
-CREATE SEQUENCE bio_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE SEQUENCE bio_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 2 CACHE 1;
 
 CREATE TABLE "public"."bio" (
     "id" integer DEFAULT nextval('bio_id_seq') NOT NULL,
@@ -14,10 +14,13 @@ CREATE TABLE "public"."bio" (
 ) WITH (oids = false);
 
 TRUNCATE "bio";
+INSERT INTO "bio" ("id", "text", "user_id") VALUES
+(1,	'Just some text for my bio!',	1),
+(2,	'...',	2);
 
 DROP TABLE IF EXISTS "transactional_outbox";
 DROP SEQUENCE IF EXISTS transactional_outbox_id_seq;
-CREATE SEQUENCE transactional_outbox_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE SEQUENCE transactional_outbox_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 3 CACHE 1;
 
 CREATE TABLE "public"."transactional_outbox" (
     "id" integer DEFAULT nextval('transactional_outbox_id_seq') NOT NULL,
@@ -49,11 +52,13 @@ CREATE TABLE "public"."user" (
 
 TRUNCATE "user";
 INSERT INTO "user" ("username", "name", "surname", "propic_path", "upload_time", "bio_id", "salt", "hash") VALUES
-('manuel2001',	'Manuel',	'Di Agostino',	'ProfilePictures/1706095149.jpeg',	1706041700,	NULL,	'h5G/JhFQfS0eGy2UmjhN3Q==',	'Kp3Hnh9eIkhmIZfp5sJSXJ9qWiOGwcWdiq5kQ8j17LI='),
-('_linux_00_',	NULL,	NULL,	'ProfilePictures/221211_11h38m46s.jpeg',	1706094311,	NULL,	'8/9DAURNdAvJ8OnywvngOw==',	'xjh7LEFoAZFfVJpw88QhfNg0xAFhfTr8EkQckMUMGmg=');
+('manuel2001',	'Manuel',	'Di Agostino',	'ProfilePictures/MSL_5DEY9jy3duxirF4HgVQIb0R_man-avatar-profile-vector.jpg',	1706041700,	1,	'h5G/JhFQfS0eGy2UmjhN3Q==',	'Kp3Hnh9eIkhmIZfp5sJSXJ9qWiOGwcWdiq5kQ8j17LI='),
+('_linux_00_',	NULL,	NULL,	'ProfilePictures/MSL_jrpEnnxiF422sfE4YfKeJRi_avatar-png-pic-male-avatar-icon.png',	1706094311,	2,	'8/9DAURNdAvJ8OnywvngOw==',	'xjh7LEFoAZFfVJpw88QhfNg0xAFhfTr8EkQckMUMGmg='),
+('pianoLegend',	NULL,	NULL,	NULL,	1706885205,	NULL,	'zAWUNHypEgDuQK5jJv3lSA==',	'PiQojwGuxiFjOqgid+PcCCB+KUeW06e15/LPJEA+NWo='),
+('ViolinStudent',	'Sara',	'Rossi',	'ProfilePictures/MSL_kk3xDibQHiL25ITyaPzFfVI_woman-with-violin-avatar.jpg',	1706885364,	NULL,	'PMRqDOAsydBylP/nJlMXVw==',	'ha4wjnetaRjT5uSspcsSTgOKtehFAJ8oxtS49JTRflI=');
 
 ALTER TABLE ONLY "public"."bio" ADD CONSTRAINT "bio_id_user_fkey" FOREIGN KEY (user_id) REFERENCES "user"(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."user" ADD CONSTRAINT "user_id_bio_fkey" FOREIGN KEY (bio_id) REFERENCES bio(id) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE;
 
--- 2024-01-29 14:44:19.359308+00
+-- 2024-02-02 14:52:04.055824+00
