@@ -31,8 +31,8 @@ namespace MusicalScoresHandler.Api.Controllers;
 		[HttpGet(Name = "GetAllCopyrights")]
 		public async Task<ActionResult<List<Copyright>>> GetAllCopyrights() {
 			try {
-				var Copyrights = await _business.GetAllCopyrights();
-				return Ok(JsonSerializer.Serialize(Copyrights));
+				var copyrights = await _business.GetAllCopyrights();
+				return Ok(copyrights);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting all Copyrights: {e}");
 				return BadRequest($"Error getting all Copyrights: {e}");

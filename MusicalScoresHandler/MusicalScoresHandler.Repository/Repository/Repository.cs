@@ -156,5 +156,9 @@ namespace MusicalScoresHandler.Repository.Repository {
 		public async Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default) {
 			return await _copyrightRepository.DeleteCopyright(name, cancellationToken);
 		}
+
+		public async Task<ICollection<MusicalScore>> SearchMusicalScoreFromTitle(string title, CancellationToken cancellationToken) {
+			return await _musicalScoresRepository.SearchMusicalScoreFromTitle(title, cancellationToken);
+		}
 	}
 }

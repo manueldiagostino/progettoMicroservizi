@@ -310,6 +310,8 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 		public async Task<PdfFile> UpdatePdfFileInfo(int fileId, PdfFileReadDto pdfFileReadDto, CancellationToken cancellationToken = default) {
+			if (fileId <= 0)
+				throw new BusinessException("fileId <= 0", nameof(fileId));
 
 			var updatedPdfFile = await _repository.UpdatePdfFileInfo(fileId, pdfFileReadDto, cancellationToken);
 			await SaveChangesAsync(cancellationToken);
@@ -318,8 +320,11 @@ namespace MusicalScoresHandler.Business.Business {
 			return updatedPdfFile;
 		}
 
-		public async Task<PdfFile> DeletePdfFile(int id, CancellationToken cancellationToken = default) {
-			var deletedPdfFile = await _repository.DeletePdfFile(id, cancellationToken);
+		public async Task<PdfFile> DeletePdfFile(int fileId, CancellationToken cancellationToken = default) {
+			if (fileId <= 0)
+				throw new BusinessException("userId <= 0", nameof(fileId));
+
+			var deletedPdfFile = await _repository.DeletePdfFile(fileId, cancellationToken);
 			await SaveChangesAsync(cancellationToken);
 
 			_logger.LogInformation($"Deleted PdfFile <{JsonSerializer.Serialize(deletedPdfFile)}>");
@@ -334,6 +339,9 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 		public async Task<Copyright> GetCopyrightByName(string name, CancellationToken cancellationToken = default) {
+			if (string.IsNullOrEmpty(name))
+				throw new BusinessException("string.IsNullOrEmpty(name)", nameof(name));
+
 			return await _repository.GetCopyrightByName(name, cancellationToken);
 		}
 
@@ -342,6 +350,11 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 		public async Task<Copyright> UpdateCopyright(string oldName, string newName, CancellationToken cancellationToken = default) {
+			if (string.IsNullOrEmpty(oldName))
+				throw new BusinessException("string.IsNullOrEmpty(name)", nameof(oldName));
+			if (string.IsNullOrEmpty(newName))
+				throw new BusinessException("string.IsNullOrEmpty(name)", nameof(newName));
+
 			var copyright = await _repository.UpdateCopyright(oldName, newName, cancellationToken);
 			await _repository.SaveChangesAsync(cancellationToken);
 
@@ -349,10 +362,20 @@ namespace MusicalScoresHandler.Business.Business {
 		}
 
 		public async Task<Copyright> DeleteCopyright(string name, CancellationToken cancellationToken = default) {
+			if (string.IsNullOrEmpty(name))
+				throw new BusinessException("string.IsNullOrEmpty(name)", nameof(name));
+			
 			var copyright = await _repository.DeleteCopyright(name, cancellationToken);
 			await _repository.SaveChangesAsync(cancellationToken);
-			
+
 			return copyright;
+		}
+
+		public async Task<ICollection<MusicalScore>> SearchMusicalScoreFromTitle(string title, CancellationToken cancellationToken) {
+			if (string.IsNullOrEmpty(title))
+				throw new BusinessException("string.IsNullOrEmpty(name)", nameof(title));
+
+			return await _repository.SearchMusicalScoreFromTitle(title, cancellationToken);
 		}
 	}
 }

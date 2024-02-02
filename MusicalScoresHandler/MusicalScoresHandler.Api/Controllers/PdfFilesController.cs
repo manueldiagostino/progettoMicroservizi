@@ -43,7 +43,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 			try {
 				await _business.CreatePdfFile(pdfFileDto, file);
 				_logger.LogInformation($"Created PDF File: {JsonSerializer.Serialize(pdfFileDto)}");
-				return Ok($"Created PDF File: {JsonSerializer.Serialize(pdfFileDto)}");
+				return Ok(pdfFileDto);
 			} catch (Exception e) {
 				_logger.LogError($"Error creating PDF File: {e}");
 				return BadRequest($"Error creating PDF File: {e}");
@@ -78,7 +78,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 				var pdfFiles = await _business.GetPdfFilesForMusicalScore(scoreId);
 				_logger.LogInformation($"Retrieved {pdfFiles.Count} PDF Files for Musical Score Id: {scoreId}");
  
-				return Ok($"{JsonSerializer.Serialize(pdfFiles)}");
+				return Ok(pdfFiles);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting PDF FilesList: {e}");
 				return BadRequest($"Error getting PDF FilesList: {e}");

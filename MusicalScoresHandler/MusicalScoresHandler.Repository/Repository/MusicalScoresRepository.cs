@@ -100,4 +100,14 @@ public class MusicalScoresRepository : IMusicalScoresRepository {
 		} catch { }
 		return false;
 	}
+
+	public async Task<ICollection<MusicalScore>> SearchMusicalScoreFromTitle(string title, CancellationToken cancellationToken) {
+		title = title.ToLower();
+
+		List<MusicalScore> results = await _dbContext.MusicalScores
+			.Where(score => score.Title.ToLower().Contains(title))
+			.ToListAsync(cancellationToken: cancellationToken);
+
+		return results;
+	}
 }

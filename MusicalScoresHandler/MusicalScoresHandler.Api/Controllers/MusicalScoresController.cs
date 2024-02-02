@@ -26,7 +26,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 			try {
 				await _business.CreateMusicalScore(musicalScoreDto);
 				_logger.LogInformation($"Created Musical Score <{JsonSerializer.Serialize(musicalScoreDto)}>");
-				return Ok($"Created Musical Score <{JsonSerializer.Serialize(musicalScoreDto)}>");
+				return Ok(musicalScoreDto);
 			} catch (Exception e) {
 				_logger.LogError($"Error creating Musical Score: {e}");
 				return BadRequest($"Error creating Musical Score: {e}");
@@ -38,7 +38,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 			try {
 				var musicalScore = await _business.GetMusicalScoreById(id);
 				_logger.LogInformation($"Retrieved Musical Score with Id: {id}");
-				return Ok($"Retrieved Musical Score with Id: <{id}>\n{JsonSerializer.Serialize(musicalScore)}");
+				return Ok(musicalScore);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting Musical Score: {e}");
 				return BadRequest($"Error getting Musical Score: {e}");
@@ -50,7 +50,18 @@ namespace MusicalScoresHandler.Api.Controllers {
 			try {
 				var musicalScores = await _business.GetAllMusicalScores();
 				_logger.LogInformation($"Retrieved {musicalScores.Count} Musical Scores");
-				return Ok($"{JsonSerializer.Serialize(musicalScores)}");
+				return Ok(musicalScores);
+			} catch (Exception e) {
+				_logger.LogError($"Error getting Musical Scores: {e}");
+				return BadRequest($"Error getting Musical Scores: {e}");
+			}
+		}
+
+		[HttpGet(Name="SearchMusicalScoreFromTitle")]
+		public async Task<ActionResult<List<MusicalScore>>> SearchMusicalScoreFromTitle([FromQuery]string title) {
+			try {
+				var results = await _business.SearchMusicalScoreFromTitle(title);
+				return Ok(results);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting Musical Scores: {e}");
 				return BadRequest($"Error getting Musical Scores: {e}");

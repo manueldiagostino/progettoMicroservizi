@@ -36,7 +36,7 @@ namespace MusicalScoresHandler.Api.Controllers {
 		public async Task<ActionResult<List<Genre>>> GetAllGenres() {
 			try {
 				var genres = await _business.GetAllGenres();
-				return Ok(JsonSerializer.Serialize(genres));
+				return Ok(genres);
 			} catch (Exception e) {
 				_logger.LogError($"Error getting all genres: {e}");
 				return BadRequest($"Error getting all genres: {e}");
