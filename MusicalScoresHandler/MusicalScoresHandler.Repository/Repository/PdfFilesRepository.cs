@@ -63,6 +63,7 @@ public class PdfFilesRepository : IPdfFilesRepository {
 		var queryable = GetQueryable(fileId);
 
 		await queryable.ExecuteUpdateAsync(x => x
+			.SetProperty(x => x.MusicalScoreId, pdfFileReadDto.MusicalScoreId)
 			.SetProperty(x => x.Publisher, pdfFileReadDto.Publisher)
 			.SetProperty(x => x.CopyrightId, pdfFileReadDto.CopyrightId)
 			.SetProperty(x => x.IsUrtext, pdfFileReadDto.IsUrtext)

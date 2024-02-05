@@ -76,10 +76,10 @@ namespace AuthorsHandler.Repository {
 
 
 		public async Task<ICollection<string>> GetExternalLinksForAuthor(string name, string surname, CancellationToken ct) {
-			var id = await GetUnique(name, surname, ct);
+			var author = await GetUnique(name, surname, ct);
 
 			var res = await _dbContext.ExternalLinks
-				.Where(l => l.authorId.Equals(id))
+				.Where(l => l.authorId == author.id)
 				.ToListAsync(ct);
 
 			List<string> urls = [];

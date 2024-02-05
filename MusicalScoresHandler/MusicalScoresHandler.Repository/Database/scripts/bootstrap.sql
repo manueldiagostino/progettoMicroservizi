@@ -93,9 +93,9 @@ CREATE TABLE "public"."pdf_file" (
 
 TRUNCATE "pdf_file";
 INSERT INTO "pdf_file" ("musical_score_id", "path", "upload_date", "publisher", "copyright_id", "is_urtext", "user_id", "comments") VALUES
-(2,	'PdfScores/MSL_Y120biIeMSa6jTXYPhDYSQY_IMSLP86694-PMLP01648-chopin-ballade_no_3.pdf',	'2024-01-25',	'Leipzig: C.F. Peters',	1,	'f',	0,	'#41057: 600 dpi no page cleaning!'),
-(3,	'PdfScores/MSL_SvaG64K4eVBCopUQy8Fpb4H_IMSLP03865-Beethoven_-_Piano_Sonatas_Lamond_-_8.pdf',	'2024-01-26',	'Klaviersonaten, Band I Berlin: Ullstein, n.d.(ca.1918). Reissue - Leipzig: Breitkopf und Härtel, 1923. Plate 28726.',	1,	'f',	0,	NULL),
-(3,	'PdfScores/MSL_QFZHh6AszsDfgmUQNkeuPrZ_IMSLP894991-PMLP1410-Sonata_No._8.pdf',	'2024-01-26',	'	Louis Köhler (1820-1886) Adolf Ruthardt (1849-1934)',	1,	'f',	0,	'	scanned at 600 dpi (for title pages see Piano Sonata No.1, Op.2 No.1), original papersize and borders. If you rate this score, please give feedback to scanner talk'),
+(1,	'PdfScores/MSL_Y120biIeMSa6jTXYPhDYSQY_IMSLP86694-PMLP01648-chopin-ballade_no_3.pdf',	'2024-01-25',	'Leipzig: C.F. Peters',	1,	'f',	0,	'#41057: 600 dpi no page cleaning!'),
+(2,	'PdfScores/MSL_SvaG64K4eVBCopUQy8Fpb4H_IMSLP03865-Beethoven_-_Piano_Sonatas_Lamond_-_8.pdf',	'2024-01-26',	'Klaviersonaten, Band I Berlin: Ullstein, n.d.(ca.1918). Reissue - Leipzig: Breitkopf und Härtel, 1923. Plate 28726.',	1,	'f',	0,	NULL),
+(2,	'PdfScores/MSL_QFZHh6AszsDfgmUQNkeuPrZ_IMSLP894991-PMLP1410-Sonata_No._8.pdf',	'2024-01-26',	'	Louis Köhler (1820-1886) Adolf Ruthardt (1849-1934)',	1,	'f',	0,	'	scanned at 600 dpi (for title pages see Piano Sonata No.1, Op.2 No.1), original papersize and borders. If you rate this score, please give feedback to scanner talk'),
 (5,	'PdfScores/MSL_Z5ohEghBgJQItLZBepeXOAt_IMSLP751817-PMLP1573-00_MOZART_SYM_41_in_C_minor,_K551_(Jupiter)_-_Score.pdf',	'2024-01-28',	'Howard Chandler Robbins Landon (1926-2009)',	1,	't',	0,	NULL);
 
 DROP TABLE IF EXISTS "score_genre_relationship";
