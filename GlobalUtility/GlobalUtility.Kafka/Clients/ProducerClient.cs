@@ -80,13 +80,7 @@ public class ProducerClient : IProducerClient {
 	protected virtual void Dispose(bool disposing) {
 		if (!_disposed) {
 			if (disposing) {
-				// Rilascia risorse gestite
-				// Chiudi file, connessioni di rete, etc.
 			}
-
-			// Rilascia risorse non gestite
-			// Libera handle di sistema, etc.
-
 			_disposed = true;
 		}
 	}

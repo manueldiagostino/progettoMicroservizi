@@ -12,7 +12,7 @@ namespace GlobalUtility.Kafka.Config {
 
 	// concrete implementations
 	public class KafkaAdminClientOptions : KafkaConfigs {
-		public new static string SectionName { get; set; } = "Kafka:AdminClient";
+		public new static string SectionName { get; set; } = "Kafka:AdminClient"; // 'new' fa override
 	}
 
 	public class KafkaProducerClientOptions : KafkaConfigs {

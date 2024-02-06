@@ -11,16 +11,6 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class KafkaExtensions {
 
-	/// <summary>
-	/// Registra il <see cref="ConsumerService{TKafkaTopicsInput}"/> e il <typeparamref name="TProducerService"/> di tipo <see cref="ProducerService{TKafkaTopicsOutput}"/>
-	/// </summary>
-	/// <typeparam name="TKafkaTopicsInput"></typeparam>
-	/// <typeparam name="TKafkaTopicsOutput"></typeparam>
-	/// <typeparam name="TMessageHandlerFactory"></typeparam>
-	/// <typeparam name="TProducerService"></typeparam>
-	/// <param name="services"></param>
-	/// <param name="configuration"></param>
-	/// <returns></returns>
 	public static IServiceCollection AddKafkaServices<TKafkaTopicsInput, TKafkaTopicsOutput, TMessageHandlerFactory, TProducerService>(
 		this IServiceCollection services, IConfiguration configuration)
 		where TKafkaTopicsInput : class, IKafkaTopics
@@ -39,14 +29,6 @@ public static class KafkaExtensions {
 		return services;
 	}
 
-	/// <summary>
-	/// Registra il <see cref="ConsumerService{TKafkaTopicsInput}"/>
-	/// </summary>
-	/// <typeparam name="TKafkaTopicsInput"></typeparam>
-	/// <typeparam name="TMessageHandlerFactory"></typeparam>
-	/// <param name="services"></param>
-	/// <param name="configuration"></param>
-	/// <returns></returns>
 	public static IServiceCollection AddKafkaConsumerService<TKafkaTopicsInput, TMessageHandlerFactory>(
 		this IServiceCollection services, IConfiguration configuration)
 		where TKafkaTopicsInput : class, IKafkaTopics
@@ -58,15 +40,7 @@ public static class KafkaExtensions {
 
 		return services;
 	}
-
-	/// <summary>
-	/// Registra il <typeparamref name="TProducerService"/> di tipo <see cref="ProducerService{TKafkaTopicsOutput}"/>
-	/// </summary>
-	/// <typeparam name="TKafkaTopicsOutput"></typeparam>
-	/// <typeparam name="TProducerService"></typeparam>
-	/// <param name="services"></param>
-	/// <param name="configuration"></param>
-	/// <returns></returns>
+	
 	public static IServiceCollection AddKafkaProducerService<TKafkaTopicsOutput, TProducerService>(
 		this IServiceCollection services, IConfiguration configuration)
 		where TKafkaTopicsOutput : class, IKafkaTopics

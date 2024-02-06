@@ -1,23 +1,9 @@
 namespace GlobalUtility.Kafka.Constants;
 
-/// <summary>
-/// Dominio valori Operations
-/// </summary>
+// Possibili operazioni
 public static class Operations {
-
-	/// <summary>
-	///  Valore: I - Insert
-	/// </summary>
 	public const string Insert = "I";
-
-	/// <summary>
-	///  Valore: U - Update
-	/// </summary>
 	public const string Update = "U";
-
-	/// <summary>
-	///  Valore: D - Delete
-	/// </summary>
 	public const string Delete = "D";
 
 	public static string GetStringValue(Enum valueEnum) {

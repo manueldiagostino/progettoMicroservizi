@@ -22,45 +22,44 @@ public abstract class AbstractOperationMessageHandler<TMessageDto, TRepository> 
 	}
 
 	public Task OnMessageReceivedAsync(string msg, CancellationToken cancellationToken = default) {
-		Logger.LogInformation("Messaggio OperationMessage da elaborare: '{msg}'...", msg);
+		Logger.LogInformation("OperationMessage to handle: '{msg}'...", msg);
 
 		if (string.IsNullOrWhiteSpace(msg)) {
-			throw new MessageHandlerException($"Il messaggio {nameof(msg)} {nameof(IOperationMessage<TMessageDto>)} non può essere null", nameof(msg));
+			throw new MessageHandlerException($"Message {nameof(msg)} {nameof(IOperationMessage<TMessageDto>)} cannot be null", nameof(msg));
 		}
 
 		return OnMessageReceivedInternalAsync(msg, cancellationToken);
 
 	}
-
 	private async Task OnMessageReceivedInternalAsync(string msg, CancellationToken cancellationToken = default) {
-		#region Deserializzazione e verifica del messaggio
-		Logger.LogInformation("Deserializzazione del messaggio OperationMessage con Dto di tipo {messageDtoType}...", MessageDtoType);
+		#region Deserialization and message verification
+		Logger.LogInformation("Deserializing OperationMessage with Dto of type {messageDtoType}...", MessageDtoType);
 
-		var options = new JsonSerializerOptions{
-    		PropertyNameCaseInsensitive = true, // Ignora la distinzione tra maiuscole e minuscole nei nomi delle proprietà
-    		PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Mappa i nomi delle proprietà in stile CamelCase
+		var options = new JsonSerializerOptions {
+			PropertyNameCaseInsensitive = true, // Ignore case sensitivity in property names
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Map property names to CamelCase style
 		};
 
 		OperationMessage<TMessageDto>? opMsg;
 		try {
 			opMsg = JsonSerializer.Deserialize<OperationMessage<TMessageDto>?>(msg, options);
 		} catch (Exception ex) {
-			throw new MessageHandlerException($"Si è verificato un errore durante la deserializzazione del messaggio {nameof(msg)} " +
-				$"'{msg}' in {nameof(OperationMessage<TMessageDto>)} con {MessageDtoType} come {nameof(OperationMessage<TMessageDto>.Dto)} : {ex}", nameof(msg), ex);
+			throw new MessageHandlerException($"An error occurred while deserializing the message {nameof(msg)} " +
+				$"'{msg}' into {nameof(OperationMessage<TMessageDto>)} with {MessageDtoType} as {nameof(OperationMessage<TMessageDto>.Dto)} : {ex}", nameof(msg), ex);
 		}
 
 		if (opMsg == null) {
-			throw new MessageHandlerException($"Il {nameof(opMsg)} {nameof(OperationMessage<TMessageDto>)}, " +
-				$"con {MessageDtoType} come {nameof(OperationMessage<TMessageDto>.Dto)}, non può essere null", nameof(msg));
+			throw new MessageHandlerException($"The {nameof(opMsg)} {nameof(OperationMessage<TMessageDto>)}, " +
+				$"with {MessageDtoType} as {nameof(OperationMessage<TMessageDto>.Dto)}, cannot be null", nameof(msg));
 		}
 
-		Logger.LogInformation($"Deserializzazione del messaggio eseguita correttamente: {JsonSerializer.Serialize(opMsg)}");
+		Logger.LogInformation($"Message deserialization successful: {JsonSerializer.Serialize(opMsg)}");
 
 		opMsg.CheckMessage();
 		#endregion
 
-		#region Operazione da eseguire
-		Logger.LogInformation("Esecuzione operazione '{operation}'...", opMsg.Operation);
+		#region Operation to be executed
+		Logger.LogInformation("Executing operation '{operation}'...", opMsg.Operation);
 		switch (opMsg.Operation) {
 			case Operations.Insert:
 				await InsertAsync(opMsg.Dto);
@@ -72,12 +71,12 @@ public abstract class AbstractOperationMessageHandler<TMessageDto, TRepository> 
 				await DeleteAsync(opMsg.Dto);
 				break;
 			default:
-				throw new MessageHandlerException($"{nameof(opMsg)}.{nameof(opMsg.Operation)} contiene un valore non valido '{opMsg.Operation}'", $"{nameof(opMsg)}.{nameof(opMsg.Operation)}");
+				throw new MessageHandlerException($"{nameof(opMsg)}.{nameof(opMsg.Operation)} contains an invalid value '{opMsg.Operation}'", $"{nameof(opMsg)}.{nameof(opMsg.Operation)}");
 		}
-		Logger.LogInformation("Operazione '{operation}' completata con successo", opMsg.Operation);
+		Logger.LogInformation("Operation '{operation}' completed successfully", opMsg.Operation);
 		#endregion
-
 	}
+
 
 	protected abstract Task InsertAsync(TMessageDto messageDto, CancellationToken cancellationToken = default);
 

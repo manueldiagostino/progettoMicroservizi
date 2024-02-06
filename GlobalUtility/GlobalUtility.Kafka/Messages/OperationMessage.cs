@@ -14,7 +14,7 @@ namespace GlobalUtility.Kafka.Messages {
 			}
 
 			if (!Operations.IsValid(Operation)) {
-				throw new MessageException($"The property {nameof(Operation)} ({typeof(IOperation<TDto>).Name}) contains an invalid value", nameof(Operation));
+				throw new MessageException($"The property {nameof(Operation)} ({typeof(IOperationMessage<TDto>).Name}) contains an invalid value", nameof(Operation));
 			}
 
 

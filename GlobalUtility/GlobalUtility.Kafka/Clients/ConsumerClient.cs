@@ -107,10 +107,10 @@ namespace GlobalUtility.Kafka.Clients {
 
 		public void Subscribe(IEnumerable<string> topics) {
 			try {
-				_logger.LogInformation("Sottoscrizione ai seguenti topic: '{topics}'...", string.Join("', '", topics));
+				_logger.LogInformation("Subscritpion to following topics: '{topics}'...", string.Join("', '", topics));
 				_consumer.Subscribe(topics);
 			} catch (Exception ex) {
-				_logger.LogError(ex, "Exception sollevata all'interno del metodo {methodName}. Exception Message: {message}", nameof(Subscribe), ex.Message);
+				_logger.LogWarning(ex, "Exception thrown inside method {methodName}. Exception Message: {message}", nameof(Subscribe), ex.Message);
 				throw;
 			}
 			_logger.LogInformation("Sottoscrizione completata!");
@@ -157,13 +157,7 @@ namespace GlobalUtility.Kafka.Clients {
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposed) {
 				if (disposing) {
-					// Rilascia risorse gestite
-					// Chiudi file, connessioni di rete, etc.
 				}
-
-				// Rilascia risorse non gestite
-				// Libera handle di sistema, etc.
-
 				_disposed = true;
 			}
 		}
