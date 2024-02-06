@@ -32,13 +32,13 @@ namespace AuthorsHandler.Business {
 				if (createdCount != 1)
 					return false;
 
-				var newAuthor = new AuthorTransactionalDto() {
+				var newAuthorTransactional = new AuthorTransactionalDto() {
 					id = await _repository.GetAuthorIdFromName(authorDto.name, authorDto.surname, ct),
 					name = authorDto.name,
 					surname = authorDto.surname
 				};
 
-				await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<AuthorTransactionalDto>(newAuthor, KafkaTopicsOutput.Authors), ct);
+				await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<AuthorTransactionalDto>(newAuthorTransactional, KafkaTopicsOutput.Authors), ct);
 				await _repository.SaveChangesAsync(ct);
 				_logger.LogInformation("Author " + authorDto.name + " " + authorDto.surname + " added");
 			} catch (Exception) {
@@ -50,6 +50,14 @@ namespace AuthorsHandler.Business {
 
 		public async Task<Author> RemoveAuthor(AuthorDto authorDto, CancellationToken ct = default) {
 			var res = await _repository.RemoveAuthor(authorDto.name, authorDto.surname, ct);
+
+			var newAuthorTransactional = new AuthorTransactionalDto() {
+				id = res.id,
+				name = res.name,
+				surname = res.surname
+			};
+
+			await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateDelete<AuthorTransactionalDto>(newAuthorTransactional, KafkaTopicsOutput.Authors), ct);
 			await _repository.SaveChangesAsync(ct);
 
 			_logger.LogInformation($"Author {JsonSerializer.Serialize(res)} deleted");
@@ -67,6 +75,14 @@ namespace AuthorsHandler.Business {
 
 		public async Task<Author> UpdateAuthor(AuthorDto oldAuthor, AuthorDto newAuthor, CancellationToken ct = default) {
 			var res = await _repository.UpdateAuthor(oldAuthor.name, oldAuthor.surname, newAuthor.name, newAuthor.surname, ct);
+
+			var newAuthorTransactional = new AuthorTransactionalDto() {
+				id = res.id,
+				name = res.name,
+				surname = res.surname
+			};
+
+			await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateUpdate<AuthorTransactionalDto>(newAuthorTransactional, KafkaTopicsOutput.Authors), ct);
 			await _repository.SaveChangesAsync(ct);
 
 			_logger.LogInformation($"Author {JsonSerializer.Serialize(oldAuthor)} updated with {JsonSerializer.Serialize(newAuthor)}");

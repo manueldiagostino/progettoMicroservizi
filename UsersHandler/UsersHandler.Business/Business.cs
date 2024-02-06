@@ -32,14 +32,14 @@ public class Business : IBusiness {
 		if (changes < 0)
 			throw new BusinessException("changes < 0");
 
-		var newUser = new UserTransactionalDto() {
+		var newUserTransactional = new UserTransactionalDto() {
 			UserId = await _repository.GetIdFromUsername(userDto.Username, cancellationToken),
 			Username = userDto.Username,
 			Name = userDto.Name,
 			Surname = userDto.Surname
 		};
 
-		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<UserTransactionalDto>(newUser, KafkaTopicsOutput.Users), cancellationToken);
+		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateInsert<UserTransactionalDto>(newUserTransactional, KafkaTopicsOutput.Users), cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		userDto.Password = "***";
@@ -86,6 +86,14 @@ public class Business : IBusiness {
 			throw new BusinessException("string.IsNullOrWhiteSpace(username)", nameof(username));
 
 		User user = await _repository.UpdateUsername(userId, username, cancellationToken);
+		var newUserTransactional = new UserTransactionalDto() {
+			UserId = user.Id,
+			Username = user.Username,
+			Name = user.Name,
+			Surname = user.Surname
+		};
+
+		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateUpdate<UserTransactionalDto>(newUserTransactional, KafkaTopicsOutput.Users), cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		_logger.LogInformation($"Updated user <{user.Id},{user.Username}> with username <{username}> ");
@@ -97,6 +105,14 @@ public class Business : IBusiness {
 			throw new BusinessException("userId <= 0", nameof(userId));
 
 		User user = await _repository.DeleteUser(userId, cancellationToken);
+		var newUserTransactional = new UserTransactionalDto() {
+			UserId = user.Id,
+			Username = user.Username,
+			Name = user.Name,
+			Surname = user.Surname
+		};
+
+		await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateDelete<UserTransactionalDto>(newUserTransactional, KafkaTopicsOutput.Users), cancellationToken);
 		await _repository.SaveChangesAsync(cancellationToken);
 
 		_logger.LogInformation($"User <{userId}, {user.Username}> deleted");
