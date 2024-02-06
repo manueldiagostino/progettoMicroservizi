@@ -104,6 +104,7 @@ public class Repository : IRepository {
 	}
 
 	public async Task<User> UpdateUsername(int userId, string newUsername, CancellationToken cancellationToken = default) {
+		// Check disponibilità newUsername
 		var queryable = GetQueryable(newUsername);
 
 		List<User> userList = await queryable.ToListAsync(cancellationToken: cancellationToken);
@@ -112,7 +113,7 @@ public class Repository : IRepository {
 
 		User user = await GetUnique(userId, cancellationToken);
 
-		await queryable.ExecuteUpdateAsync(x => x
+		await GetQueryable(userId).ExecuteUpdateAsync(x => x
 			.SetProperty(x => x.Username, newUsername)
 		, cancellationToken);
 
@@ -121,10 +122,11 @@ public class Repository : IRepository {
 
 	public async Task<User> DeleteUser(int userId, CancellationToken cancellationToken = default) {
 		User user = await GetUnique(userId, cancellationToken);
+		
+		if (user.PropicPath != null)
+			await DeleteImage(userId, cancellationToken);
+
 		_dbContext.Remove(user);
-
-		await DeleteImage(userId, cancellationToken);
-
 		return user;
 	}
 

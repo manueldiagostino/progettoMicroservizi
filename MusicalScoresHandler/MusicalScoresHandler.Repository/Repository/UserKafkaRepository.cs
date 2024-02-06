@@ -54,7 +54,6 @@ public class UserKafkaRepository : IUserKafkaRepository {
 			.Where(x => x.UserId==userKafka.UserId);
 
 		int changes = await queryable.ExecuteUpdateAsync(x => x
-			.SetProperty(x => x.UserId, userKafka.UserId)
 			.SetProperty(x => x.Username, userKafka.Username)
 			.SetProperty(x => x.Name, userKafka.Name)
 			.SetProperty(x => x.Surname, userKafka.Surname)

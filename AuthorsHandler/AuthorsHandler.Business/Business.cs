@@ -78,8 +78,8 @@ namespace AuthorsHandler.Business {
 
 			var newAuthorTransactional = new AuthorTransactionalDto() {
 				id = res.id,
-				name = res.name,
-				surname = res.surname
+				name = newAuthor.name,
+				surname = newAuthor.surname
 			};
 
 			await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateUpdate<AuthorTransactionalDto>(newAuthorTransactional, KafkaTopicsOutput.Authors), ct);

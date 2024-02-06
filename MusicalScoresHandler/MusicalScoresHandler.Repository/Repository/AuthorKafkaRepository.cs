@@ -35,7 +35,6 @@ public class AuthorKafkaRepository : IAuthorKafkaRepository {
 			.Where(x => x.AuthorId==authorKafka.AuthorId);
 
 		int changes = await queryable.ExecuteUpdateAsync(x => x
-			.SetProperty(x => x.AuthorId, authorKafka.AuthorId)
 			.SetProperty(x => x.Name, authorKafka.Name)
 			.SetProperty(x => x.Surname, authorKafka.Surname)
 		, cancellationToken);

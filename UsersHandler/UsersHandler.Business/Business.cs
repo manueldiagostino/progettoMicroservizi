@@ -88,7 +88,7 @@ public class Business : IBusiness {
 		User user = await _repository.UpdateUsername(userId, username, cancellationToken);
 		var newUserTransactional = new UserTransactionalDto() {
 			UserId = user.Id,
-			Username = user.Username,
+			Username = username, // nuovo username
 			Name = user.Name,
 			Surname = user.Surname
 		};
