@@ -27,7 +27,7 @@ public class BioController : ControllerBase {
 			return Ok($"Bio added for user <{user.UserId},{user.Username}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -39,7 +39,7 @@ public class BioController : ControllerBase {
 			return Ok($"Updated user <{user.UserId},{user.Username}> with bio <{JsonConvert.SerializeObject(bioDto)}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -56,7 +56,7 @@ public class BioController : ControllerBase {
 			return Ok($"{JsonConvert.SerializeObject(bioDto)}");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 
@@ -68,7 +68,7 @@ public class BioController : ControllerBase {
 			return Ok($"Deleted bio for user <{user.UserId},{user.Username}>");
 
 		} catch (Exception e) {
-			return BadRequest($"{e.Message}");
+			return BadRequest($"{e}");
 		}
 	}
 }

@@ -4,7 +4,7 @@
 
 DROP TABLE IF EXISTS "bio";
 DROP SEQUENCE IF EXISTS bio_id_seq;
-CREATE SEQUENCE bio_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 2 CACHE 1;
+CREATE SEQUENCE bio_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 3 CACHE 1;
 
 CREATE TABLE "public"."bio" (
     "id" integer DEFAULT nextval('bio_id_seq') NOT NULL,
@@ -20,7 +20,7 @@ INSERT INTO "bio" ("id", "text", "user_id") VALUES
 
 DROP TABLE IF EXISTS "transactional_outbox";
 DROP SEQUENCE IF EXISTS transactional_outbox_id_seq;
-CREATE SEQUENCE transactional_outbox_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 3 CACHE 1;
+CREATE SEQUENCE transactional_outbox_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
 CREATE TABLE "public"."transactional_outbox" (
     "id" integer DEFAULT nextval('transactional_outbox_id_seq') NOT NULL,

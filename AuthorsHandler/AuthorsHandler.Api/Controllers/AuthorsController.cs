@@ -45,7 +45,7 @@ namespace AuthorsHandler.Controllers {
 				var res = await _business.UpdateAuthor(oldAuthor, newAuthor);
 				return Ok($"User updated: {update}");
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace AuthorsHandler.Controllers {
 				int res = await _business.GetAuthorIdFromName(name, surname);
 				return Ok($"User id: {res}");
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace AuthorsHandler.Controllers {
 				var res = await _business.GetAllAuthors();
 				return Ok(res);
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -73,9 +73,9 @@ namespace AuthorsHandler.Controllers {
 		public async Task<IActionResult> GetExternalLinksForAuthor(string name, string surname) {
 			try {
 				ICollection<string> res = await _business.GetExternalLinksForAuthor(name, surname);
-				return Ok(String.Join("\n", res));
+				return Ok(res);
 			} catch (Exception e) {
-				return NotFound($"{e.Message}");
+				return NotFound($"{e}");
 
 			}
 		}
@@ -84,9 +84,9 @@ namespace AuthorsHandler.Controllers {
 		public async Task<IActionResult> InsertExternalLink([FromQuery] AuthorDto authorDto, string url) {
 			try {
 				ExternalLink res = await _business.InsertExternalLinkForAuthor(authorDto, url);
-				return Ok($"Inserted link: {res}");
+				return Ok($"Inserted link: {res.url}");
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -96,7 +96,7 @@ namespace AuthorsHandler.Controllers {
 				ExternalLink res = await _business.UpdateExternalLinkForAuthor(authorDto, linkId, newUrl);
 				return Ok($"Inserted link: {res}");
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace AuthorsHandler.Controllers {
 				ExternalLink res = await _business.RemoveExternalLinkForAuthor(authorDto, linkId);
 				return Ok($"Inserted link: {res}");
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace AuthorsHandler.Controllers {
 				Author author = await _business.GetAuthorFromId(authorId);
 				return Ok(author);
 			} catch (Exception e) {
-				return BadRequest($"{e.Message}");
+				return BadRequest($"{e}");
 			}
 		}
 

@@ -3,14 +3,17 @@ using AuthorsHandler.Repository.Model;
 using GlobalUtility.Kafka.Model;
 using GlobalUtility.Manager.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace AuthorsHandler.Repository {
 	public class Repository : IRepository {
 		protected AuthorsHandlerDbContext _dbContext;
+		private ILogger<Repository> _logger;
 
-		public Repository(AuthorsHandlerDbContext authorsHandlerDbContext) {
+		public Repository(AuthorsHandlerDbContext authorsHandlerDbContext, ILogger<Repository> logger) {
 			_dbContext = authorsHandlerDbContext;
+			_logger = logger;
 		}
 
 		private IQueryable<Author> GetQueryable(int id) {
@@ -146,8 +149,8 @@ namespace AuthorsHandler.Repository {
 
 				// Costruisce e restituisce l'URL sanificato come stringa
 				return uriBuilder.Uri.ToString();
-			} catch (UriFormatException) {
-				return string.Empty;
+			} catch (UriFormatException e) {
+				throw e;
 			}
 		}
 
@@ -156,6 +159,8 @@ namespace AuthorsHandler.Repository {
 				authorId = (await GetUnique(name, surname, ct)).id,
 				url = Repository.SanitizeUrl(url)
 			};
+
+
 
 			await _dbContext.AddAsync(target, ct);
 			return target;
